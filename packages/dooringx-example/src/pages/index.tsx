@@ -22,6 +22,7 @@ import { PREVIEWSTATE } from '@/constant';
 import { Button, Input, message, Modal, Popover, Upload } from 'antd';
 import { localeKey } from '../../../dooringx-lib/dist/locale';
 import { LeftRegistComponentMapItem } from 'dooringx-lib/dist/core/crossDrag';
+import { toPng } from '../dom2image';
 
 export const HeaderHeight = '40px';
 const footerConfig = function () {
@@ -49,7 +50,27 @@ export default function IndexPage() {
 
 	const [value, setValue] = useState('');
 	const [open, setOpen] = useState(false);
+	const [open1, setOpen1] = useState(false);
 
+	const saveAsPngFile = () => {
+		toPng(document.getElementById('yh-container')).then((res) => {
+			var img = new Image();
+			img.onload = function() {
+				const canvas = document.createElement('canvas'),
+					ctx = canvas.getContext("2d");
+				canvas.width = img.width;
+				canvas.height = img.height;
+				ctx && ctx.drawImage(img, 0, 0, img.width, img.height);
+				canvas.toBlob((blob) => {
+					const tagA = document.createElement('a');
+					tagA.href = URL.createObjectURL(blob);
+					tagA.download = 'test.png';
+					tagA.click();
+				}, 'image/jpeg', 0.9);
+			}
+			img.src = res;
+		});
+	}
 	const createAndDownloadFile = (fileName: string) => {
 		const aTag = document.createElement('a');
 		const res = config.getStore().getData();
@@ -65,6 +86,12 @@ export default function IndexPage() {
 	return (
 		<div {...innerContainerDragUp(config)}>
 			<div style={{ height: HeaderHeight }}>
+				<Button onClick={() => saveAsPngFile()}>
+					截图
+				</Button>
+				<Button onClick={() => setOpen1(true)}>
+					预览
+				</Button>
 				<Button
 					onClick={() => {
 						window.open('/iframe');
@@ -72,7 +99,7 @@ export default function IndexPage() {
 				>
 					iframe 预览
 				</Button>
-				<Button
+				{/* <Button
 					onClick={() => {
 						window.open('/preview');
 					}}
@@ -103,7 +130,7 @@ export default function IndexPage() {
 					}}
 				>
 					远程组件
-				</Button>
+				</Button> */}
 				<Button
 					onClick={() => {
 						createAndDownloadFile('dooring.json');
@@ -111,13 +138,13 @@ export default function IndexPage() {
 				>
 					下载json
 				</Button>
-				<Button
+				{/* <Button
 					onClick={() => {
 						setOpen(true);
 					}}
 				>
 					上传json
-				</Button>
+				</Button> */}
 			</div>
 			<Modal
 				visible={open}
@@ -151,7 +178,13 @@ export default function IndexPage() {
 					<Button icon={<UploadOutlined />}>&nbsp; 点击上传</Button>
 				</Upload>
 			</Modal>
-
+			<Modal visible={open1} onOk={()=>setOpen1(false)} onCancel={()=>setOpen1(false)} title={'preview'} width={600}>
+				<iframe src="/iframe" style={{
+					height: '700px',
+					width: '100%',
+					border: '0',
+				}}></iframe>
+			</Modal>		
 			<div
 				style={{
 					display: 'flex',

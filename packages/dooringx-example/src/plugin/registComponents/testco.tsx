@@ -114,7 +114,7 @@ const MButton = createComponent({
 	},
 	initData: {
 		props: {
-			text: 'yehuozhili',
+			text: 'button',
 			sizeData: [100, 30],
 			backgroundColor: 'rgba(0,132,255,1)',
 			lineHeight: 1,
