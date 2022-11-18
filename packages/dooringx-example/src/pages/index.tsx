@@ -28,9 +28,9 @@ export const HeaderHeight = '40px';
 const footerConfig = function () {
 	return (
 		<>
-			<Popover content={'快捷键'} title={null} trigger="hover">
+			{/* <Popover content={'快捷键'} title={null} trigger="hover">
 				<Button type="text" icon={<InsertRowBelowOutlined />}></Button>
-			</Popover>
+			</Popover> */}
 		</>
 	);
 };
@@ -92,13 +92,13 @@ export default function IndexPage() {
 				<Button onClick={() => setOpen1(true)}>
 					预览
 				</Button>
-				<Button
+				{/* <Button
 					onClick={() => {
 						window.open('/iframe');
 					}}
 				>
 					iframe 预览
-				</Button>
+				</Button> */}
 				{/* <Button
 					onClick={() => {
 						window.open('/preview');

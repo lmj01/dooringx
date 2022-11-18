@@ -36,6 +36,7 @@ export const en: typeof zhCN = {
 	'right.noprops': 'No properties have been configured',
 	'right.global': 'Global config',
 	'right.containerheight': 'Container height',
+	'right.containerwidth': 'Container width',
 	'right.containerColor': 'Container background color',
 	'right.bodyColor': 'Body background color',
 	'right.fontSize': 'Container font size',

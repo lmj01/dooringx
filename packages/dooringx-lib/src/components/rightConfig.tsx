@@ -197,6 +197,23 @@ function RightConfig(props: PropsWithChildren<RightConfigProps>) {
 					</Row>
 					<Row style={{ padding: '10px 0' }}>
 						<Col span={6} style={{ ...titletStyle }}>
+							{replaceLocale('right.containerwidth', '容器宽度', props.config)}
+						</Col>
+						<Col span={18} style={colStyle}>
+							<InputNumber
+								min={0}
+								value={props.config.getStore().getData().container.width}
+								onChange={(e) => {
+									const val = e;
+									const originData = deepcopy(props.config.getStore().getData());
+									originData.container.width = val;
+									props.config.getStore().setData(originData);
+								}}
+							/>
+						</Col>
+					</Row>
+					<Row style={{ padding: '10px 0' }}>
+						<Col span={6} style={{ ...titletStyle }}>
 							{replaceLocale('right.containerColor', '容器底色', props.config)}
 						</Col>
 						<Col span={18} style={colStyle}>

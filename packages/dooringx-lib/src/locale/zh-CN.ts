@@ -33,6 +33,7 @@ export const zhCN = {
 	'right.noprops': '还没有配置属性',
 	'right.global': '全局设置',
 	'right.containerheight': '容器高度',
+	'right.containerwidth': '容器宽度',
 	'right.containerColor': '容器底色',
 	'right.bodyColor': 'body底色',
 	'right.fontSize': '容器字号',
