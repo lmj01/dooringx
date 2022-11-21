@@ -14,6 +14,9 @@ import { IBlockType } from '../../../../dooringx-lib/dist/core/store/storetype';
 import Store from '../../../../dooringx-lib/dist/core/store';
 import { useEffect } from 'react';
 
+/**
+ * 组件属性
+ */
 interface InputProps {
 	data: IBlockType;
 	context: string;
@@ -21,6 +24,10 @@ interface InputProps {
 	config: UserConfig;
 }
 
+/**
+ * 组件
+ * @param pr 
+ */
 const InputTemp = (pr: InputProps) => {
 	const { props } = pr.data;
 	const data = pr.data;
@@ -129,6 +136,10 @@ const InputCo = new ComponentItemFactory(
 			createPannelOptions<FormMap, 'input'>('input', {
 				receive: 'warnning', //用于发送回的props，必传 ,跨组件传递需要指定额外字
 				label: '验证消息',
+			}),
+			createPannelOptions<FormMap, 'input'>('input', {
+				receive: 'warnning', //用于发送回的props，必传 ,跨组件传递需要指定额外字
+				label: 'ss消息',
 			}),
 		],
 		fn: [

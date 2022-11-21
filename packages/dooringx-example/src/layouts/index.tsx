@@ -5,7 +5,7 @@
  * @LastEditTime: 2022-01-13 13:22:40
  * @FilePath: \dooringx\packages\dooringx-example\src\layouts\index.tsx
  */
-import { Button } from 'antd';
+import { Button, Input } from 'antd';
 import { UserConfig } from 'dooringx-lib';
 import 'dooringx-lib/dist/dooringx-lib.esm.css';
 import { createContext, useState } from 'react';
@@ -92,6 +92,7 @@ export const LocaleContext = createContext<LocaleContextType>({
 });
 
 export default function Layout({ children }: IRouteComponentProps) {
+	(window as any).mjconfig = config;
 	const [l, setLocale] = useState<localeKey>('zh-CN');
 	return (
 		<LocaleContext.Provider value={{ change: setLocale, current: l }}>
@@ -100,5 +101,4 @@ export default function Layout({ children }: IRouteComponentProps) {
 			</IntlProvider>
 		</LocaleContext.Provider>
 	);
-	return <configContext.Provider value={config}>{children}</configContext.Provider>;
 }

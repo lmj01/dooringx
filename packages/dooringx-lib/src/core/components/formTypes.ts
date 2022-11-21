@@ -16,6 +16,11 @@ export interface CreateOptionsRes<T, K extends keyof T> {
 	option: T[K];
 }
 
+/**
+ * 
+ * @param type 
+ * @param option 
+ */
 export function createPannelOptions<T, K extends keyof T>(
 	type: K,
 	option: T[K]

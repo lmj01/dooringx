@@ -37,6 +37,30 @@ const LeftRegistMap: LeftRegistComponentMapItem[] = [
 		displayName: '测试按钮',
 		urlFn: () => import('./registComponents/testco'),
 	},
+	{
+		type: 'basic',
+		component: 'shapeLine',
+		img: 'icon-anniu',
+		imgCustom: <PlayCircleOutlined />,
+		displayName: '直线',
+		urlFn: () => import('./registComponents/shapeLine'),
+	},
+	{
+		type: 'basic',
+		component: 'inputText',
+		img: 'icon-anniu',
+		imgCustom: <PlayCircleOutlined />,
+		displayName: '文本',
+		urlFn: () => import('./registComponents/text'),
+	},
+	{
+		type: 'basic',
+		component: 'table',
+		img: 'icon-anniu',
+		imgCustom: <PlayCircleOutlined />,
+		displayName: '表格',
+		urlFn: () => import('./registComponents/table'),
+	},
 ];
 
 export const defaultConfig: Partial<InitConfig> = {
@@ -47,25 +71,25 @@ export const defaultConfig: Partial<InitConfig> = {
 			icon: <HighlightOutlined />,
 			displayName: '基础',
 		},
-		{
-			type: 'media',
-			icon: <PlayCircleOutlined />,
-			displayName: '媒体组件',
-		},
-		{
-			type: 'datax',
-			icon: <ContainerOutlined />,
-			custom: true,
-			displayName: '数据源',
-			customRender: (config) => <LeftDataPannel config={config}></LeftDataPannel>,
-		},
-		{
-			type: 'xxc',
-			icon: <ContainerOutlined />,
-			custom: true,
-			displayName: '自定义',
-			customRender: () => <div>我是自定义渲染</div>,
-		},
+		// {
+		// 	type: 'media',
+		// 	icon: <PlayCircleOutlined />,
+		// 	displayName: '媒体组件',
+		// },
+		// {
+		// 	type: 'datax',
+		// 	icon: <ContainerOutlined />,
+		// 	custom: true,
+		// 	displayName: '数据源',
+		// 	customRender: (config) => <LeftDataPannel config={config}></LeftDataPannel>,
+		// },
+		// {
+		// 	type: 'xxc',
+		// 	icon: <ContainerOutlined />,
+		// 	custom: true,
+		// 	displayName: '自定义',
+		// 	customRender: () => <div>我是自定义渲染</div>,
+		// },
 	],
 	initComponentCache: {
 		input: { component: InputCo },
