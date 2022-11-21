@@ -11,15 +11,28 @@ export interface FormBaseType {
 export interface FormInputType extends FormBaseType {
 	label: string;
 }
-export interface FormActionButtonType {}
+export interface FormActionButtonType {
+
+}
 export interface FormAnimateControlType {}
 
 export interface FormSwitchType extends FormBaseType {
 	label: string;
 }
+
+export interface ElementPositionType {
+	label?: string;
+}
+
+export interface ElementSizeType {
+	label?: string;
+}
+
 export interface FormMap {
 	input: FormInputType;
 	actionButton: FormActionButtonType;
 	animateControl: FormAnimateControlType;
 	switch: FormSwitchType;
+	elPosition: ElementPositionType;
+	elSize: ElementSizeType;
 }

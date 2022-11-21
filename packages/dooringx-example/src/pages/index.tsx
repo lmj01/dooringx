@@ -136,15 +136,15 @@ export default function IndexPage() {
 						createAndDownloadFile('dooring.json');
 					}}
 				>
-					下载json
+					保存模板
 				</Button>
-				{/* <Button
+				<Button
 					onClick={() => {
 						setOpen(true);
 					}}
 				>
-					上传json
-				</Button> */}
+					打开模板
+				</Button>
 			</div>
 			<Modal
 				visible={open}

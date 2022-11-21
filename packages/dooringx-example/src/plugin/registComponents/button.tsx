@@ -40,6 +40,7 @@ function ButtonTemp(pr: ComponentRenderConfigProps) {
 		return functionCenter.register({
 			id: `${pr.data.id}+changeText`,
 			fn: async (ctx, next, config, args: any, _eventList, iname) => {
+				console.log('-button-op1-')
 				const userSelect = iname.data;
 				const ctxVal = changeUserValue(
 					userSelect['改变文本数据源'],

@@ -103,30 +103,30 @@ export const defaultConfig: Partial<InitConfig> = {
 				</div>
 			),
 		},
-		{
-			type: 'animate',
-			icon: (
-				<div className="right-tab-item" style={{ width: 50, textAlign: 'center' }}>
-					动画
-				</div>
-			),
-		},
-		{
-			type: 'fn',
-			icon: (
-				<div className="right-tab-item" style={{ width: 50, textAlign: 'center' }}>
-					函数
-				</div>
-			),
-		},
-		{
-			type: 'actions',
-			icon: (
-				<div className="right-tab-item" style={{ width: 50, textAlign: 'center' }}>
-					事件
-				</div>
-			),
-		},
+		// {
+		// 	type: 'animate',
+		// 	icon: (
+		// 		<div className="right-tab-item" style={{ width: 50, textAlign: 'center' }}>
+		// 			动画
+		// 		</div>
+		// 	),
+		// },
+		// {
+		// 	type: 'fn',
+		// 	icon: (
+		// 		<div className="right-tab-item" style={{ width: 50, textAlign: 'center' }}>
+		// 			函数
+		// 		</div>
+		// 	),
+		// },
+		// {
+		// 	type: 'actions',
+		// 	icon: (
+		// 		<div className="right-tab-item" style={{ width: 50, textAlign: 'center' }}>
+		// 			事件
+		// 		</div>
+		// 	),
+		// },
 	],
 	initFunctionMap: functionMap,
 	initCommandModule: commandModules,

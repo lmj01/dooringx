@@ -44,11 +44,11 @@ const ContextMenu = () => {
 			<div
 				style={{ width: '100%' }}
 				onClick={() => {
-					commander.exec('redo');
+					commander.exec('delete');
 					handleclick();
 				}}
 			>
-				<Button>自定义</Button>
+				<Button style={{ width: '100%' }}>删除</Button>
 			</div>
 			<div
 				style={{ width: '100%' }}
@@ -59,6 +59,24 @@ const ContextMenu = () => {
 			>
 				<Button style={{ width: '100%' }}>隐藏</Button>
 			</div>
+			{/* <div
+				style={{ width: '100%' }}
+				onClick={() => {
+					commander.exec('undo');
+					handleclick();
+				}}
+			>
+				<Button>撤消</Button>
+			</div>
+			<div
+				style={{ width: '100%' }}
+				onClick={() => {
+					commander.exec('redo');
+					handleclick();
+				}}
+			>
+				<Button>重做</Button>
+			</div> */}
 			<div
 				style={{ width: '100%' }}
 				onClick={() => {
