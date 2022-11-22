@@ -13,13 +13,14 @@ import {
 	LeftConfig,
 	ContainerWrapper,
 	Control,
+	scaleFn
 } from 'dooringx-lib';
-import { InsertRowBelowOutlined, UploadOutlined } from '@ant-design/icons';
+import { MinusOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import { useContext, useEffect, useState } from 'react';
 import { configContext, LocaleContext } from '@/layouts';
 import { useCallback } from 'react';
 import { PREVIEWSTATE } from '@/constant';
-import { Button, Input, message, Modal, Popover, Upload } from 'antd';
+import { Button, Input, message, Modal, Statistic, Upload } from 'antd';
 import { localeKey } from '../../../dooringx-lib/dist/locale';
 import { LeftRegistComponentMapItem } from 'dooringx-lib/dist/core/crossDrag';
 import { toPng } from '../dom2image';
@@ -34,6 +35,10 @@ const footerConfig = function () {
 		</>
 	);
 };
+
+function toPercentage(val:number) {
+	return Number(val / 0.8 * 100).toFixed(2).toString()
+}
 
 export default function IndexPage() {
 	const config = useContext(configContext);
@@ -51,6 +56,11 @@ export default function IndexPage() {
 	const [value, setValue] = useState('');
 	const [open, setOpen] = useState(false);
 	const [open1, setOpen1] = useState(false);
+	const [scale, setScale] = useState(toPercentage(config.scaleState.value));
+
+	useEffect(() => {
+		setScale(toPercentage(config.scaleState.value));
+	}, [config.scaleState.value]);
 
 	const saveAsPngFile = () => {
 		toPng(document.getElementById('yh-container')).then((res) => {
@@ -85,66 +95,79 @@ export default function IndexPage() {
 
 	return (
 		<div {...innerContainerDragUp(config)}>
-			<div style={{ height: HeaderHeight }}>
-				<Button onClick={() => saveAsPngFile()}>
-					截图
-				</Button>
-				<Button onClick={() => setOpen1(true)}>
-					预览
-				</Button>
-				{/* <Button
-					onClick={() => {
-						window.open('/iframe');
-					}}
-				>
-					iframe 预览
-				</Button> */}
-				{/* <Button
-					onClick={() => {
-						window.open('/preview');
-					}}
-				>
-					普通预览
-				</Button>
-				<Button
-					onClick={() => {
-						locale.change((pre: localeKey) => {
-							return pre === 'zh-CN' ? 'en' : 'zh-CN';
-						});
-					}}
-				>
-					切换语言
-				</Button>
-				<Input
-					style={{ width: 200 }}
-					value={value}
-					onChange={(e) => setValue(e.target.value)}
-				></Input>
-				<Button
-					onClick={() => {
-						const leftprops: Partial<LeftRegistComponentMapItem> = {
-							type: 'basic',
-							img: 'https://img.guguzhu.com/d/file/android/ico/2021/09/08/rytzi2w34tm.png',
-						};
-						config.scriptSingleLoad(value, leftprops);
-					}}
-				>
-					远程组件
-				</Button> */}
-				<Button
-					onClick={() => {
-						createAndDownloadFile('dooring.json');
-					}}
-				>
-					保存模板
-				</Button>
-				<Button
-					onClick={() => {
-						setOpen(true);
-					}}
-				>
-					打开模板
-				</Button>
+			<div style={{ display:'flex', height: HeaderHeight }}>
+				<div style={{}}>
+					<Button onClick={() => saveAsPngFile()}>
+						截图
+					</Button>
+					<Button onClick={() => setOpen1(true)}>
+						预览
+					</Button>
+					{/* <Button
+						onClick={() => {
+							window.open('/iframe');
+						}}
+					>
+						iframe 预览
+					</Button> */}
+					{/* <Button
+						onClick={() => {
+							window.open('/preview');
+						}}
+					>
+						普通预览
+					</Button>
+					<Button
+						onClick={() => {
+							locale.change((pre: localeKey) => {
+								return pre === 'zh-CN' ? 'en' : 'zh-CN';
+							});
+						}}
+					>
+						切换语言
+					</Button>
+					<Input
+						style={{ width: 200 }}
+						value={value}
+						onChange={(e) => setValue(e.target.value)}
+					></Input>
+					<Button
+						onClick={() => {
+							const leftprops: Partial<LeftRegistComponentMapItem> = {
+								type: 'basic',
+								img: 'https://img.guguzhu.com/d/file/android/ico/2021/09/08/rytzi2w34tm.png',
+							};
+							config.scriptSingleLoad(value, leftprops);
+						}}
+					>
+						远程组件
+					</Button> */}
+					<Button
+						onClick={() => {
+							createAndDownloadFile('dooring.json');
+						}}
+					>
+						保存模板
+					</Button>
+					<Button
+						onClick={() => {
+							setOpen(true);
+						}}
+					>
+						打开模板
+					</Button>
+				</div>
+				<div style={{display:'flex', flex:'auto', justifyContent:'flex-end'}}>
+					<Button type="primary" icon={<MinusOutlined />} onClick={()=>{
+						scaleFn.decrease(0.1, config);
+						// setScale(toPercentage(config.scaleState.value));
+					}}></Button>
+					<div style={{marginTop:'5px',textAlign:'center',width:'40px'}}>{scale}</div>
+					<Button type="primary" icon={<PlusOutlined />} onClick={()=>{
+						scaleFn.increase(0.1, config);
+						// setScale(toPercentage(config.scaleState.value));
+					}}></Button>
+				</div>
 			</div>
 			<Modal
 				visible={open}
