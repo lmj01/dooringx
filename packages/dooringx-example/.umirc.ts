@@ -19,6 +19,8 @@ export default defineConfig({
 		antd: true,
 		baseNavigator: true,
 	},
+	base: '/form/',
+	publicPath: '/form/',
 	routes: [
 		{
 			exact: false,
