@@ -51,6 +51,6 @@ export const zhCN = {
 	'settings.marklineColor': '辅助线颜色',
 	'settings.marklineStyle': '辅助线样式',
 	'settings.containerOverflow': '容器边界外不显示元素',
-	'form.size.width': '宽度',
-	'form.size.height': '高度',	
+	'form.size.width': 'W',
+	'form.size.height': 'H',	
 };
