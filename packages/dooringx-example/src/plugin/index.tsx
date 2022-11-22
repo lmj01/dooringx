@@ -8,40 +8,40 @@
 
 import { InitConfig, LeftDataPannel } from 'dooringx-lib';
 import { LeftRegistComponentMapItem } from 'dooringx-lib/dist/core/crossDrag';
-import { ContainerOutlined, PlayCircleOutlined, HighlightOutlined } from '@ant-design/icons';
+import { ContainerOutlined, PlayCircleOutlined, HighlightOutlined, TableOutlined, LineOutlined, MessageOutlined } from '@ant-design/icons';
 import commandModules from './commanderModules';
 import { functionMap } from './functionMap';
 import { Formmodules } from './formComponentModules';
 import InputCo from './registComponents/inputCo';
 
 const LeftRegistMap: LeftRegistComponentMapItem[] = [
-	{
-		type: 'basic',
-		component: 'button',
-		img: 'icon-anniu',
-		imgCustom: <PlayCircleOutlined />,
-		displayName: '按钮',
-		urlFn: () => import('./registComponents/button'),
-	},
-	{
-		type: 'basic',
-		component: 'input',
-		img: 'https://img.guguzhu.com/d/file/android/ico/2021/09/08/rytzi2w34tm.png',
-		displayName: '输入框',
-	},
-	{
-		type: 'basic',
-		component: 'testco',
-		img: 'icon-anniu',
-		imgCustom: <PlayCircleOutlined />,
-		displayName: '测试按钮',
-		urlFn: () => import('./registComponents/testco'),
-	},
+	// {
+	// 	type: 'basic',
+	// 	component: 'button',
+	// 	img: 'icon-anniu',
+	// 	imgCustom: <PlayCircleOutlined />,
+	// 	displayName: '按钮',
+	// 	urlFn: () => import('./registComponents/button'),
+	// },
+	// {
+	// 	type: 'basic',
+	// 	component: 'input',
+	// 	img: 'https://img.guguzhu.com/d/file/android/ico/2021/09/08/rytzi2w34tm.png',
+	// 	displayName: '输入框',
+	// },
+	// {
+	// 	type: 'basic',
+	// 	component: 'testco',
+	// 	img: 'icon-anniu',
+	// 	imgCustom: <PlayCircleOutlined />,
+	// 	displayName: '测试按钮',
+	// 	urlFn: () => import('./registComponents/testco'),
+	// },
 	{
 		type: 'basic',
 		component: 'shapeLine',
 		img: 'icon-anniu',
-		imgCustom: <PlayCircleOutlined />,
+		imgCustom: <LineOutlined />,
 		displayName: '直线',
 		urlFn: () => import('./registComponents/shapeLine'),
 	},
@@ -49,7 +49,7 @@ const LeftRegistMap: LeftRegistComponentMapItem[] = [
 		type: 'basic',
 		component: 'inputText',
 		img: 'icon-anniu',
-		imgCustom: <PlayCircleOutlined />,
+		imgCustom: <MessageOutlined />,
 		displayName: '文本',
 		urlFn: () => import('./registComponents/text'),
 	},
@@ -57,7 +57,7 @@ const LeftRegistMap: LeftRegistComponentMapItem[] = [
 		type: 'basic',
 		component: 'table',
 		img: 'icon-anniu',
-		imgCustom: <PlayCircleOutlined />,
+		imgCustom: <TableOutlined />,
 		displayName: '表格',
 		urlFn: () => import('./registComponents/table'),
 	},

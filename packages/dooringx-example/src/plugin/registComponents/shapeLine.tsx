@@ -1,12 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ComponentRenderConfigProps } from '../../../../dooringx-lib/dist/core/components/componentItem';
 import { ComponentItemFactory, createPannelOptions } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 
 
-function ShapeLineComponent(props: ComponentRenderConfigProps) {
-	const data = props.data;
-	const [color, setColor] = useState('black');
+function ShapeLineComponent(pr: ComponentRenderConfigProps) {
+	const data = pr.data;
+	const props = data.props;
+	const [color, setColor] = useState(props.color);
+	useEffect(()=>{
+		if (typeof props.borderColor === 'string') setColor(props.borderColor);
+		else {
+			const {r,g,b,a} = props.borderColor;
+			setColor(`rgba(${r},${g},${b},${a})`);
+		}
+	}, [props.borderColor]);
 	return (
 		<div
 			style={{
@@ -15,7 +23,8 @@ function ShapeLineComponent(props: ComponentRenderConfigProps) {
 				width: data.width,
 				height: data.height,
 				overflow: 'hidden',
-				border:'1px solid',
+				borderWidth: (data.height as number)/2,
+				borderStyle: props.borderStyle,
 				borderColor: color,
 				position: 'absolute',
 				top: '0',
@@ -36,9 +45,17 @@ const DShapeLine = new ComponentItemFactory(
 			createPannelOptions<FormMap, 'elSize'>('elSize', {
 				label: '大小'
 			}),
+			createPannelOptions<FormMap, 'elBorder'>('elBorder', {
+				label: '样式',
+				editWidth:false,
+			}),
 		],
 	},
 	{ // initial option value
+		props: {
+			borderColor: 'rgba(0,0,0,1)',
+			borderStyle: 'solid',
+		},
 		width: 200,
 		height: 1,
 		zIndex: 1,

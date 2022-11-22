@@ -69,3 +69,5 @@ export { useIframePostMessage, useIframeHook } from './hooks';
 export { IframeTarget } from './components/iframeTarget';
 //locale
 export * as locale from './locale';
+// colorpicker
+export { default as ColorPicker } from './components/colorPicker'

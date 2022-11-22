@@ -27,6 +27,17 @@ export interface ElementPositionType {
 export interface ElementSizeType {
 	label?: string;
 }
+export interface ElementBorderType {
+	label?: string;
+	width?: number;
+	style?: string;
+	color?: string;
+	editWidth: boolean;
+}
+
+export interface TableType {
+	label?: string;
+}
 
 export interface FormMap {
 	input: FormInputType;
@@ -35,4 +46,6 @@ export interface FormMap {
 	switch: FormSwitchType;
 	elPosition: ElementPositionType;
 	elSize: ElementSizeType;
+	elBorder: ElementBorderType;
+	table: TableType;
 }
