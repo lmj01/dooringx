@@ -1,11 +1,9 @@
 import { Table } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-	changeUserValue,
 	createComponent,
 	createPannelOptions,
 	useDynamicAddEventCenter,
-	useRegistFunc,
 } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { ComponentRenderConfigProps } from 'dooringx-lib/dist/core/components/componentItem';
@@ -25,43 +23,40 @@ function TableComponent(pr: ComponentRenderConfigProps) {
 		}
 	}, [eventCenter, pr.config, pr.context, pr.data.id]);
 
-	const [text, setText] = useState('');
-	const op1 = props.op1;
-
-	const fn = useMemo(() => {
-		const functionCenter = eventCenter.getFunctionCenter();
-		return functionCenter.register({
-			id: `${pr.data.id}+changeText`,
-			fn: async (ctx, next, config, args: any, _eventList, iname) => {
-				console.log('-table-op1-b-')
-				const userSelect = iname.data;
-				const ctxVal = changeUserValue(
-					userSelect['改变文本数据源'],
-					args,
-					'_changeval',
-					config,
-					ctx
-				);
-				const text = ctxVal[0];
-				setText(text);
-				next();
-			},
-			config: [
-				{
-					name: '改变文本数据源',
-					data: ['ctx', 'input', 'dataSource'],
-					options: {
-						receive: '_changeval',
-						multi: false,
-					},
-				},
-			],
-			name: `${pr.data.id}+改变文本函数`,
-			componentId: pr.data.id,
-		});
-	}, []);
-
-	useRegistFunc(op1, pr.context, fn);
+	const columns = [
+		{
+		  title: 'Name',
+		  dataIndex: 'name',
+		  key: 'name',
+		  width: '80',
+		},
+		{
+		  title: 'Age',
+		  dataIndex: 'age',
+		  key: 'age',
+		  width: '80',
+		},
+		{
+		  title: 'Address',
+		  dataIndex: 'address',
+		  key: 'address',
+		  width: '80',
+		},
+	];
+	const dataSource = [
+		{
+		  key: '1',
+		  name: 'Mike',
+		  age: 32,
+		  address: '10 Downing Street',
+		},
+		{
+		  key: '2',
+		  name: 'John',
+		  age: 42,
+		  address: '10 Downing Street',
+		},
+	];
 
 	return (
 		<Table
@@ -78,11 +73,10 @@ function TableComponent(pr: ComponentRenderConfigProps) {
 				textDecoration: props.fontData.textDecoration,
 				lineHeight: props.lineHeight,
 			}}
-			onClick={() => {
-				eventCenter.runEventQueue(`${pr.data.id}-click`, pr.config);
-			}}
+			tableLayout={'fixed'}
+			dataSource={dataSource}
+			columns={columns}
 		>
-			{text ? text : props.text}
 		</Table>
 	);
 }
@@ -92,23 +86,13 @@ const RegTable = createComponent({
 	display: '表格',
 	props: {
 		style: [
-			createPannelOptions<FormMap, 'input'>('input', {
-				receive: 'text',
-				label: '文字',
+			createPannelOptions<FormMap, 'elPosition'>('elPosition', {
+				label:'位置'
 			}),
-			createPannelOptions<FormMap, 'switch'>('switch', {
-				receive: 'op1',
-				label: '改变文本函数',
+			createPannelOptions<FormMap, 'elSize'>('elSize', {
+				label: '大小'
 			}),
 		],
-		fn: [
-			createPannelOptions<FormMap, 'switch'>('switch', {
-				receive: 'op1',
-				label: '改变文本函数',
-			}),
-		],
-		animate: [createPannelOptions<FormMap, 'animateControl'>('animateControl', {})],
-		actions: [createPannelOptions<FormMap, 'actionButton'>('actionButton', {})],
 	},
 	initData: {
 		props: {
@@ -117,7 +101,6 @@ const RegTable = createComponent({
 			backgroundColor: 'rgba(0,132,255,1)',
 			lineHeight: 1,
 			borderRadius: 0,
-			op1: false,
 			borderData: {
 				borderWidth: 0,
 				borderColor: 'rgba(0,0,0,1)',
@@ -131,8 +114,8 @@ const RegTable = createComponent({
 				fontWeight: 'normal',
 			},
 		},
-		width: 100,
-		height: 30,
+		width: 400,
+		height: 200,
 		rotate: {
 			canRotate: true,
 			value: 0,
