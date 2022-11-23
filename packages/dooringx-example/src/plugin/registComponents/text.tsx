@@ -57,6 +57,7 @@ const DInputText = createComponent({
 				color: 'rgba(0,0,0,1)',
 				fontSize:14,
 				styles:[],
+				field: ['fontSize','color','styles'],
 			}),
 		],
 	},

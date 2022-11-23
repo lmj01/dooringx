@@ -21,7 +21,8 @@ export interface FormSwitchType extends FormBaseType {
 }
 
 export interface BaseType {
-	label?: string;
+	field?: Array<string>; // 字段名称
+	label?: string; // 描述文字
 }
 export interface ElementPositionType extends BaseType {
 }
@@ -40,8 +41,13 @@ export interface TableType extends BaseType {
 export interface FontType extends BaseType {
 	color?: string;
 	fontSize:number;
-	styles:Array<string>;
+	styles:Array<string>;	
 }
+
+export interface OpTitleType extends BaseType {
+
+}
+
 
 export interface FormMap {
 	input: FormInputType;
@@ -53,4 +59,5 @@ export interface FormMap {
 	elBorder: ElementBorderType;
 	table: TableType;
 	font: FontType;
+	opTitle: OpTitleType;
 }
