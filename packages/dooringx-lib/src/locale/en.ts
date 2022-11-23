@@ -54,4 +54,6 @@ export const en: typeof zhCN = {
 	'settings.marklineColor': 'Markline color',
 	'settings.marklineStyle': 'Markline style',
 	'settings.containerOverflow': 'Container Overflow',
+	'form.size.width': 'W',
+	'form.size.height': 'H',	
 };

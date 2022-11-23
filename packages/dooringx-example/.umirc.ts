@@ -20,7 +20,7 @@ export default defineConfig({
 		baseNavigator: true,
 	},
 	base: '/form/',
-	publicPath: '/form/',
+	// publicPath: '/form/',
 	routes: [
 		{
 			exact: false,
