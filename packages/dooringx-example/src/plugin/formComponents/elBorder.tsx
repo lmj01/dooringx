@@ -1,10 +1,11 @@
 
-import React, { useMemo, memo } from 'react';
-import { InputNumber, Row, Col, Select } from 'antd';
-import { deepCopy, UserConfig, ColorPicker } from 'dooringx-lib';
+import { useMemo, memo } from 'react';
+import { Row, Col, Select } from 'antd';
+import { UserConfig, ColorPicker } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { CreateOptionsRes } from 'dooringx-lib/dist/core/components/formTypes';
 import { IBlockType } from 'dooringx-lib/dist/core/store/storetype';
+import { updateBlockData } from './helper';
 
 interface MBorderProps {
 	data: CreateOptionsRes<FormMap, 'elBorder'>;
@@ -28,14 +29,7 @@ const MBorder = (props: MBorderProps) => {
 			</Col>
 			<Col span={6} style={{ lineHeight: '30px' }}>
 				<Select defaultValue={props.current.props['borderStyle']} onChange={(val) => {
-						const clonedata = deepCopy(store.getData());
-						const newblock = clonedata.block.map((v: IBlockType) => {
-							if (v.id === props.current.id) {
-								v.props['borderStyle'] = val;
-							}
-							return v;
-						});
-						store.setData({ ...clonedata, block: [...newblock] });
+						updateBlockData(store, props, (v) => v.props['borderStyle'] = val);
 					}} options={[
 						{value:'solid', label:'实线'},
 						{value:'dotted', label:'圆点'},
@@ -56,15 +50,8 @@ const MBorder = (props: MBorderProps) => {
 					}} />
 			</Col> */}
 			<Col span={4} style={{ lineHeight: '30px', margin:'auto' }}>
-				<ColorPicker initColor={props.current.props['borderColor']} onChange={(val:any)=>{					
-					const clonedata = deepCopy(store.getData());
-					const newblock = clonedata.block.map((v: IBlockType) => {
-						if (v.id === props.current.id) {
-							v.props['borderColor'] = val;
-						}
-						return v;
-					});
-					store.setData({ ...clonedata, block: [...newblock] });
+				<ColorPicker initColor={props.current.props['borderColor']} onChange={(val:any)=>{		
+					updateBlockData(store, props, (v) => v.props['borderColor'] = val);
 				}} />
 			</Col>
 		</Row>

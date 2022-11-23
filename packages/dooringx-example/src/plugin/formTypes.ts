@@ -20,23 +20,27 @@ export interface FormSwitchType extends FormBaseType {
 	label: string;
 }
 
-export interface ElementPositionType {
+export interface BaseType {
 	label?: string;
+}
+export interface ElementPositionType extends BaseType {
 }
 
-export interface ElementSizeType {
-	label?: string;
+export interface ElementSizeType extends BaseType {
 }
-export interface ElementBorderType {
-	label?: string;
+export interface ElementBorderType extends BaseType {
 	width?: number;
 	style?: string;
 	color?: string;
 	editWidth: boolean;
 }
 
-export interface TableType {
-	label?: string;
+export interface TableType extends BaseType {
+}
+export interface FontType extends BaseType {
+	color?: string;
+	fontSize:number;
+	styles:Array<string>;
 }
 
 export interface FormMap {
@@ -48,4 +52,5 @@ export interface FormMap {
 	elSize: ElementSizeType;
 	elBorder: ElementBorderType;
 	table: TableType;
+	font: FontType;
 }

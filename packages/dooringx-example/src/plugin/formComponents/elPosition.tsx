@@ -1,10 +1,11 @@
 
-import React, { useMemo, memo, useEffect, useState } from 'react';
+import { useMemo, memo, useEffect, useState } from 'react';
 import { InputNumber, Row, Col } from 'antd';
-import { deepCopy, UserConfig } from 'dooringx-lib';
+import { UserConfig } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { CreateOptionsRes } from 'dooringx-lib/dist/core/components/formTypes';
 import { IBlockType } from 'dooringx-lib/dist/core/store/storetype';
+import { updateBlockData } from './helper';
 interface MPositionProps {
 	data: CreateOptionsRes<FormMap, 'elPosition'>;
 	current: IBlockType;
@@ -36,27 +37,13 @@ const MPosition = (props: MPositionProps) => {
 			<Col span={9} style={{ lineHeight: '30px' }}>
 				X：
 				<InputNumber defaultValue={left} onChange={(val:number) => {
-						const clonedata = deepCopy(store.getData());
-						const newblock = clonedata.block.map((v: IBlockType) => {
-							if (v.id === props.current.id) {
-								v['left'] = val;
-							}
-							return v;
-						});
-						store.setData({ ...clonedata, block: [...newblock] });
+						updateBlockData(store, props, (v) => v['left'] = val);
 					}} />
 			</Col>
 			<Col span={9} style={{ lineHeight: '30px' }}>
 				Y：
 				<InputNumber defaultValue={top} onChange={(val:number) => {
-						const clonedata = deepCopy(store.getData());
-						const newblock = clonedata.block.map((v: IBlockType) => {
-							if (v.id === props.current.id) {
-								v['top'] = val;
-							}
-							return v;
-						});
-						store.setData({ ...clonedata, block: [...newblock] });
+					updateBlockData(store, props, (v) => v['top'] = val);
 					}} />
 			</Col>
 		</Row>
