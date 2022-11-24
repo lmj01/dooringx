@@ -5,17 +5,23 @@ import {
 } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { ComponentRenderConfigProps } from 'dooringx-lib/dist/core/components/componentItem';
+import { ICell, IGridRow, ISingleRow, ITableColumn } from './table';
+import { array } from 'yargs';
+import { forkCountArray } from '../utils';
 
-function TableColumn({columns}:{columns:Array<string>}) {
-	return (
-		<thead>
-			<tr>
-				{columns.map((col,index)=>{
-					return <th key={index}>{col}</th>
-				})}
-			</tr>
-		</thead>
-	)
+function TableColumn({columns, showHeader}:ITableColumn) {
+	if (showHeader) {
+		return (
+			<thead>
+				<tr>
+					{columns.map((col,index)=>{
+						return <th key={index}>{col.label}</th>
+					})}
+				</tr>
+			</thead>
+		)
+	}
+	return null;
 }
 function TableFooter({footers}:{footers:Array<string>}) {
 	return (
@@ -28,40 +34,69 @@ function TableFooter({footers}:{footers:Array<string>}) {
 		</footer>
 	)
 }
-function TableSingleRow({rowData}:{rowData:Array<string>}) {
+function TableSingleRow({cells}:ISingleRow) {
 	return (
 		<tr>
-			{rowData.map((row, index)=>{
-				return <td key={index}>{row}</td>
+			{cells.map((row, index)=>{
+				return <td key={index}>{row.label}</td>
 			})}
 		</tr>
 	)
 }
-function TableRows({rows}:{rows:Array<Array<string>>}) {
+function TableRows({rows}:IGridRow) {
 	return (
 		<tbody>
 			{rows.map((row,index)=>{
-				return <TableSingleRow key={index} rowData={row} />
+				return <TableSingleRow key={index} cells={row.cells} />
 			})}
 		</tbody>
 	)
 }
 function TableComponent(pr: ComponentRenderConfigProps) {
 	const props = pr.data.props;	
-	const [columns, setColumns] = useState(['col1','col2']);
-	useEffect(()=> setColumns(props.tableColumn), [props.tableColumn]);
 
-	const [footers, setFooters] = useState(['footer1','footer2']);
-	const [rows, setRows] = useState([
-		['row1a','row1b'],
-		['row2a','row2b'],
-	]);
+	const [columns, setColumns] = useState<Array<ICell>>([]);
+	useEffect(()=> {
+		const tmp = props.tableColumn.map((e:string,i:number)=>({x:i,y:0,label:e} as ICell));
+		setColumns(tmp)
+		updateColumnAndRow();
+	}, [props.tableColumn]);
+
+	const [rcount, setRcount] = useState(props.tableRowCount);
+	useEffect(()=>{
+		updateColumnAndRow();
+	}, [props.tableRowCount]);
+
+	
+	const [header, setHeader] = useState(props.tableShowHeader);
+	useEffect(()=> setHeader(props.tableShowHeader), [props.tableShowHeader]);
+
+	// const [footers, setFooters] = useState(['footer1','footer2']);
+	const [rows, setRows] = useState<Array<ISingleRow>>([]);
+
+	function updateColumnAndRow() {
+		let c1 = props.tableRowCount
+		let c2 = props.tableColumn.length;
+		const arrRow = forkCountArray(c1);
+		const arrCol = forkCountArray(c2);
+		let tmp:Array<ISingleRow> = [];
+		arrRow.map((r,ir) => {			
+			let tmpRow:Array<ICell> = [];
+			arrCol.map((c,ic)=>{
+				tmpRow.push({x:ir,y:ic,label:`${ir}-${ic}`});
+			})
+			tmp.push({cells:tmpRow});
+		})
+		setRows(tmp);	
+	}
+
 	return (
-		<table style={{
+		<table className={'mj-table'} style={{
 			width: pr.data.width ? pr.data.width : props.sizeData[0],
 			height: pr.data.height ? pr.data.height : props.sizeData[1],
 		}}>
-			<TableColumn columns={columns} />
+			<colgroup span={columns.length}></colgroup>
+			<TableColumn columns={columns} showHeader={header} />
 			<TableRows rows={rows} />
 			{/* <TableFooter footers={footers} /> */}
       </table>
@@ -81,7 +116,7 @@ const RegTable = createComponent({
 			}),
 			createPannelOptions<FormMap, 'opTable'>('opTable', {
 				label: '表格',
-				field:['tableType','tableColumn']
+				field:['tableType','tableColumn','tableShowHeader','tableRowCount','tableRow']
 			}),
 		],
 	},
@@ -106,8 +141,11 @@ const RegTable = createComponent({
 			},
 			tableType: '',
 			tableColumn: [],
+			tableShowHeader:true,
+			tableRow: [],
+			tableRowCount: 3,
 		},
-		width: 400,
+		width: 200,
 		height: 200,
 		rotate: {
 			canRotate: true,

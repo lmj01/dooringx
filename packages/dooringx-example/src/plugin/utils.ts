@@ -7,3 +7,10 @@ export function colorToString(color:any) {
 	const {r,g,b,a} = color;
 	return `rgba(${r},${g},${b},${a})`;
 }
+
+/**
+ * 创建空数据数组
+ */
+export function forkCountArray(len:number) {
+	return [...new Array(len)].map(e=>[]);
+}

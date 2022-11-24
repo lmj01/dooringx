@@ -1,6 +1,7 @@
 
 import { useMemo, memo, useState } from 'react';
-import { Row, Col, Transfer, Select } from 'antd';
+import { Row, Col, Transfer, Select, Switch, InputNumber } from 'antd';
+import type { TransferDirection } from 'antd/es/transfer';
 import { UserConfig } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { CreateOptionsRes } from 'dooringx-lib/dist/core/components/formTypes';
@@ -22,12 +23,17 @@ const MBorder = (props: MBorderProps) => {
 	const option = useMemo(() => {
 		return props.data?.option || {};
 	}, [props.data]);
-	const [targetKeys, setTargetKeys] = useState<Array<string>>();
+	
+	const [tblType, setTblType] = useState<string>(props.current.props[(option as any).field[0]]);
+	const [showHeader, setShowHeader] = useState<boolean>(props.current.props[(option as any).field[2]]);
+	const [rowCount, setRowCount] = useState<number>(props.current.props[(option as any).field[3]]);
+
+	const [targetKeys, setTargetKeys] = useState<Array<string>>(props.current.props[(option as any).field[1]]);
 	const [selectedKeys, setSelectedKeys] = useState<Array<string>>([]);
 	const store = props.config.getStore();
 	const listTable = [
 		{
-			value:'记录表', label:'记录表',
+			value:'tblRecord', label:'记录表',
 			sub: [
 				{ key:'RECORD-F001', label:'RECORD-field1'},
 				{ key:'RECORD-F002', label:'RECORD-field2'},
@@ -39,7 +45,7 @@ const MBorder = (props: MBorderProps) => {
 			]
 		},
 		{
-			value:'报告表', label:'报告表',
+			value:'tblReport', label:'报告表',
 			sub: [
 				{ key:'REPORT-F001', label:'REPORT-field1'},
 				{ key:'REPORT-F002', label:'REPORT-field2'},
@@ -61,11 +67,17 @@ const MBorder = (props: MBorderProps) => {
 		return res;
 	});
 
-	const handleChange = (newTargetKeys: string[]) => {
-		setTargetKeys(newTargetKeys);		
-		updateBlockData(store, props, (v) => v.props[(option as any).field[1]] = selectedKeys);
+	const handleChange = (newTargetKeys: string[], direction: TransferDirection, moveKeys: string[]) => {
+		if (direction === 'right') {
+			let tmp = [...targetKeys, ...moveKeys];
+			setTargetKeys(tmp);		
+			updateBlockData(store, props, (v) => v.props[(option as any).field[1]] = tmp);
+		} else if (direction === 'left') {
+			setTargetKeys(newTargetKeys);
+		}
 	}
 	const handleSelectChange = (sourceSelectedKeys: string[], targetSelectedKeys: string[]) => {
+		// setSelectedKeys([...targetSelectedKeys, ...sourceSelectedKeys]);
 		setSelectedKeys([...sourceSelectedKeys, ...targetSelectedKeys]);
 	};
 
@@ -75,12 +87,24 @@ const MBorder = (props: MBorderProps) => {
 				<Col span={6} style={{ lineHeight: '30px' }}>
 					{(option as any)?.label || '样式'}：
 				</Col>
-				<Col span={9} style={{ lineHeight: '30px' }}>
-					<Select defaultValue={1} onChange={(val, opt:any) => {
+				<Col span={7} style={{ lineHeight: '30px' }}>
+					<Select defaultValue={tblType} disabled={!showHeader} onChange={(val, opt:any) => {
+						setTblType(val);
 						setDatasource(opt.sub)
 						updateBlockData(store, props, (v) => v.props[(option as any).field[0]] = val);
-						updateBlockData(store, props, (v) => v.props[(option as any).field[1]] = []);
 					}} options={listTable} />
+				</Col>
+				<Col span={5} style={{ lineHeight: '30px' }}>
+					<Switch checkedChildren={'显示头'} unCheckedChildren={'关闭头'} defaultChecked={props.current.props[(option as any).field[2]]} onChange={(val) => {
+						setShowHeader(val);
+						updateBlockData(store, props, (v) => v.props[(option as any).field[2]] = val);
+					}} />
+				</Col>
+				<Col span={6} title={'列数'} style={{ lineHeight: '30px' }}>
+					<InputNumber defaultValue={rowCount} min={1} onChange={(val)=>{
+						setRowCount(val);
+						updateBlockData(store, props, (v) => v.props[(option as any).field[3]] = val);
+					}} />
 				</Col>
 			</Row>
 			<Row style={{padding:'5px'}}>
@@ -91,6 +115,21 @@ const MBorder = (props: MBorderProps) => {
 						render={(item) => item.label}
 						oneWay
 					/>
+				</Col>
+			</Row>
+			<Row style={{padding:'5px'}}>
+				<Col span={6} style={{ lineHeight: '30px' }}>
+					{(option as any)?.label2 || '修改'}：
+				</Col>
+				<Col span={7} style={{ lineHeight: '30px' }}>
+					{/* <Select defaultValue={tblType} disabled={!showHeader} onChange={(val, opt:any) => {
+						setTblType(val);
+						setDatasource(opt.sub)
+						updateBlockData(store, props, (v) => v.props[(option as any).field[0]] = val);
+					}} options={()=>{
+						value:'tblReport', label:'报告表',
+						return [];
+					}} /> */}
 				</Col>
 			</Row>
 		</div>
