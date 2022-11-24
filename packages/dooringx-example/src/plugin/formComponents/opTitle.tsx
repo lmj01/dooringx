@@ -18,8 +18,6 @@ const MBorder = (props: MBorderProps) => {
 		return props.data?.option || {};
 	}, [props.data]);
 	const store = props.config.getStore();
-	const [sub, setSub] = useState([]);
-
 	const listTitle = [
 		{
 			value:'记录编号', label:'记录编号',
@@ -36,6 +34,10 @@ const MBorder = (props: MBorderProps) => {
 			]
 		},
 	]
+	const [sub, setSub] = useState(()=>{
+		let tmp = listTitle.filter(e=>e.value==props.current.props[(option as any).field[0]])
+		if (tmp.length > 0) return tmp[0].sub;
+	});
 	return (
 		<Row style={{ padding: '10px' }}>
 			<Col span={6} style={{ lineHeight: '30px' }}>
@@ -45,6 +47,7 @@ const MBorder = (props: MBorderProps) => {
 				<Select defaultValue={props.current.props[(option as any).field[0]]} onChange={(val, opt:any) => {
 					setSub(opt.sub)
 					updateBlockData(store, props, (v) => v.props[(option as any).field[0]] = val);
+					updateBlockData(store, props, (v) => v.props[(option as any).field[1]] = '');
 				}} options={listTitle} />
 			</Col>
 			<Col span={9} style={{ lineHeight: '20px', margin:'auto' }}>

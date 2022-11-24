@@ -45,7 +45,8 @@ export interface FontType extends BaseType {
 }
 
 export interface OpTitleType extends BaseType {
-
+}
+export interface OpTableType extends BaseType {	
 }
 
 
@@ -60,4 +61,5 @@ export interface FormMap {
 	table: TableType;
 	font: FontType;
 	opTitle: OpTitleType;
+	opTable: OpTableType;
 }
