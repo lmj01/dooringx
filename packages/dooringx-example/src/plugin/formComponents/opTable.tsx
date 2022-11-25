@@ -27,6 +27,7 @@ const MBorder = (props: MBorderProps) => {
 	const [tblType, setTblType] = useState<string>(props.current.props[(option as any).field[0]]);
 	const [showHeader, setShowHeader] = useState<boolean>(props.current.props[(option as any).field[2]]);
 	const [rowCount, setRowCount] = useState<number>(props.current.props[(option as any).field[3]]);
+	const [colCount, setColCount] = useState<number>(props.current.props[(option as any).field[4]]);
 
 	const [targetKeys, setTargetKeys] = useState<Array<string>>(props.current.props[(option as any).field[1]]);
 	const [selectedKeys, setSelectedKeys] = useState<Array<string>>([]);
@@ -87,18 +88,23 @@ const MBorder = (props: MBorderProps) => {
 				<Col span={6} style={{ lineHeight: '30px' }}>
 					{(option as any)?.label || '样式'}：
 				</Col>
-				<Col span={7} style={{ lineHeight: '30px' }}>
-					<Select defaultValue={tblType} disabled={!showHeader} onChange={(val, opt:any) => {
-						setTblType(val);
-						setDatasource(opt.sub)
-						updateBlockData(store, props, (v) => v.props[(option as any).field[0]] = val);
-					}} options={listTable} />
-				</Col>
 				<Col span={5} style={{ lineHeight: '30px' }}>
-					<Switch checkedChildren={'显示头'} unCheckedChildren={'关闭头'} defaultChecked={props.current.props[(option as any).field[2]]} onChange={(val) => {
+					<Switch checkedChildren={'显示头'} unCheckedChildren={'关闭头'} defaultChecked={showHeader} onChange={(val) => {
 						setShowHeader(val);
 						updateBlockData(store, props, (v) => v.props[(option as any).field[2]] = val);
 					}} />
+				</Col>
+				<Col span={7} title={'行数'} style={{ lineHeight: '30px' }}>
+					{ showHeader ? <Select defaultValue={tblType} disabled={!showHeader} onChange={(val, opt:any) => {
+							setTblType(val);
+							setDatasource(opt.sub)
+							updateBlockData(store, props, (v) => v.props[(option as any).field[0]] = val);
+						}} options={listTable} />
+						: <InputNumber defaultValue={colCount} min={1} onChange={(val)=>{
+							setColCount(val);
+							updateBlockData(store, props, (v) => v.props[(option as any).field[4]] = val);
+						}} />
+					}
 				</Col>
 				<Col span={6} title={'列数'} style={{ lineHeight: '30px' }}>
 					<InputNumber defaultValue={rowCount} min={1} onChange={(val)=>{
@@ -107,16 +113,20 @@ const MBorder = (props: MBorderProps) => {
 					}} />
 				</Col>
 			</Row>
-			<Row style={{padding:'5px'}}>
-				<Col span={24} style={{ lineHeight: '30px' }}>
-					<Transfer titles={['Source', 'Target']}
-						dataSource={datasource} targetKeys={targetKeys} selectedKeys={selectedKeys}
-						onChange={handleChange} onSelectChange={handleSelectChange}
-						render={(item) => item.label}
-						oneWay
-					/>
-				</Col>
-			</Row>
+			{
+				showHeader ? 
+				<Row style={{padding:'5px'}}>
+					<Col span={24} style={{ lineHeight: '30px' }}>
+						<Transfer titles={['Source', 'Target']}
+							dataSource={datasource} targetKeys={targetKeys} selectedKeys={selectedKeys}
+							onChange={handleChange} onSelectChange={handleSelectChange}
+							render={(item) => item.label}
+							oneWay
+						/>
+					</Col>
+				</Row>
+				: <></>
+			}
 			<Row style={{padding:'5px'}}>
 				<Col span={6} style={{ lineHeight: '30px' }}>
 					{(option as any)?.label2 || '修改'}：

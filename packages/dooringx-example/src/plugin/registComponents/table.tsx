@@ -6,7 +6,6 @@ import {
 import { FormMap } from '../formTypes';
 import { ComponentRenderConfigProps } from 'dooringx-lib/dist/core/components/componentItem';
 import { ICell, IGridRow, ISingleRow, ITableColumn } from './table';
-import { array } from 'yargs';
 import { forkCountArray } from '../utils';
 
 function TableColumn({columns, showHeader}:ITableColumn) {
@@ -62,21 +61,25 @@ function TableComponent(pr: ComponentRenderConfigProps) {
 		updateColumnAndRow();
 	}, [props.tableColumn]);
 
-	const [rcount, setRcount] = useState(props.tableRowCount);
 	useEffect(()=>{
 		updateColumnAndRow();
-	}, [props.tableRowCount]);
+	}, [props.tableRowCount, props.tableColCount]);
 
 	
+	const [ccount, setCcount] = useState<number>(0);
 	const [header, setHeader] = useState(props.tableShowHeader);
-	useEffect(()=> setHeader(props.tableShowHeader), [props.tableShowHeader]);
+	useEffect(()=> {
+		setHeader(props.tableShowHeader)
+		updateColumnAndRow();
+	}, [props.tableShowHeader]);
 
 	// const [footers, setFooters] = useState(['footer1','footer2']);
 	const [rows, setRows] = useState<Array<ISingleRow>>([]);
 
 	function updateColumnAndRow() {
-		let c1 = props.tableRowCount
-		let c2 = props.tableColumn.length;
+		let c1 = props.tableRowCount;
+		let c2 = props.tableShowHeader ? props.tableColumn.length : props.tableColCount;
+		setCcount(c2);
 		const arrRow = forkCountArray(c1);
 		const arrCol = forkCountArray(c2);
 		let tmp:Array<ISingleRow> = [];
@@ -95,7 +98,7 @@ function TableComponent(pr: ComponentRenderConfigProps) {
 			width: pr.data.width ? pr.data.width : props.sizeData[0],
 			height: pr.data.height ? pr.data.height : props.sizeData[1],
 		}}>
-			<colgroup span={columns.length}></colgroup>
+			<colgroup span={ccount}></colgroup>
 			<TableColumn columns={columns} showHeader={header} />
 			<TableRows rows={rows} />
 			{/* <TableFooter footers={footers} /> */}
@@ -116,7 +119,7 @@ const RegTable = createComponent({
 			}),
 			createPannelOptions<FormMap, 'opTable'>('opTable', {
 				label: '表格',
-				field:['tableType','tableColumn','tableShowHeader','tableRowCount','tableRow']
+				field:['tableType','tableColumn','tableShowHeader','tableRowCount','tableColCount','tableRow']
 			}),
 		],
 	},
@@ -144,6 +147,7 @@ const RegTable = createComponent({
 			tableShowHeader:true,
 			tableRow: [],
 			tableRowCount: 3,
+			tableColCount: 3,
 		},
 		width: 200,
 		height: 200,
