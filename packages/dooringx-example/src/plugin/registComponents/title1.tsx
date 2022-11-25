@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { createPannelOptions, createComponent } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { ComponentRenderConfigProps } from 'dooringx-lib/dist/core/components/componentItem';
-import { colorToString } from '../utils';
+import { colorToString } from '../helper/utils';
 
 
 function InputTtextComponent(pr: ComponentRenderConfigProps) {

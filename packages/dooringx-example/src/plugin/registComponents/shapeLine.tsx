@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { ComponentRenderConfigProps } from '../../../../dooringx-lib/dist/core/components/componentItem';
 import { ComponentItemFactory, createPannelOptions } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
-import { colorToString } from '../utils';
+import { colorToString } from '../helper/utils';
 
 
 function ShapeLineComponent(pr: ComponentRenderConfigProps) {

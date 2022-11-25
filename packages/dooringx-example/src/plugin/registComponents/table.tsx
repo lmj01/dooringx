@@ -1,13 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { createComponent, createPannelOptions } from 'dooringx-lib';
-import {
-	createComponent,
-	createPannelOptions, deepCopy
-} from 'dooringx-lib';
+import { createComponent, createPannelOptions, deepCopy } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { ComponentRenderConfigProps } from 'dooringx-lib/dist/core/components/componentItem';
 import { ICell, IGridRow, ISingleRow, ITableColumn } from '../helper/table';
-import { forkCountArray } from '../utils';
+import { forkCountArray } from '../helper/utils';
 
 function TableColumn({columns, showHeader}:ITableColumn) {
 	if (showHeader) {
@@ -96,11 +92,11 @@ function TableComponent(pr: ComponentRenderConfigProps) {
 
 	useEffect(() => {
 		const {x, y, label} = props.tableCell;
-		const rowData = deepCopy(rows);
-		console.log('-cell-', rowData, props.tableCell)
-		if (rowData.length > 0 && y && x) {
-			const tmp = rowData[y].cells.filter(e=>e.x==x && e.y==y)[0];
-			if (tmp) tmp.label = label;
+		console.log('-cell-', props.tableCell, rows)
+		if (rows.length > 0 && y !== undefined && x !== undefined) {
+			const rowData = deepCopy(rows);
+			rowData[x].cells[y].label = label;
+			console.log('-23', rowData)
 			setRows(rowData);
 		}
 	}, [props.tableCell])
