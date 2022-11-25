@@ -2,12 +2,13 @@
 import { useMemo, memo, useState, useEffect } from 'react';
 import { Row, Col, Transfer, Select, Switch, InputNumber, Input } from 'antd';
 import type { TransferDirection } from 'antd/es/transfer';
-import { UserConfig } from 'dooringx-lib';
+import { UserConfig, deepCopy } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { CreateOptionsRes } from 'dooringx-lib/dist/core/components/formTypes';
 import { IBlockType } from 'dooringx-lib/dist/core/store/storetype';
 import { updateFormBlockData } from '../helper/update';
 import { forkCountArray } from '../helper/utils';
+import { createTableByRowAndCol, ICell, ISingleRow, syncTableData } from '../helper/table';
 
 interface MBorderProps {
 	data: CreateOptionsRes<FormMap, 'opTable'>;
@@ -18,6 +19,13 @@ interface MBorderProps {
 interface TableFieldType {
 	key:string;
 	label:string;
+}
+
+interface IModifyType {
+	x:number;
+	y:number;
+	type:string;
+	value:string|number;
 }
 
 function ComSelect({count, onChange}:any) {
@@ -47,6 +55,7 @@ const MBorder = (props: MBorderProps) => {
 	
 	const [rowNo, setRowNo] = useState<number>(0);
 	const [colNo, setColNo] = useState<number>(0);
+	const [rows, setRows] = useState<Array<ISingleRow>>([]);
 	
 	const [targetKeys, setTargetKeys] = useState<Array<string>>(props.current.props[(option as any).field[1]]);
 	const [selectedKeys, setSelectedKeys] = useState<Array<string>>([]);
@@ -91,17 +100,38 @@ const MBorder = (props: MBorderProps) => {
 		if (direction === 'right') {
 			let tmp = [...targetKeys, ...moveKeys];
 			setTargetKeys(tmp);		
-			updateFormBlockData(store, props, (v) => v.props[(option as any).field[1]] = tmp);
+			let tmp2 = (tmp as Array<string>).map((e:string,i:number)=>({x:i,y:0,label:e} as ICell));
+			updateFormBlockData(store, props, (v) => v.props[(option as any).field[1]] = tmp2);
 		} else if (direction === 'left') {
 			setTargetKeys(newTargetKeys);
 		}
-		if (showHeader) setColCount(newTargetKeys.length);
-		else setColCount(props.current.props[(option as any).field[4]]);;
+		updateTableRowData(0, newTargetKeys.length)
 	}
 	const handleSelectChange = (sourceSelectedKeys: string[], targetSelectedKeys: string[]) => {
 		// setSelectedKeys([...targetSelectedKeys, ...sourceSelectedKeys]);
 		setSelectedKeys([...sourceSelectedKeys, ...targetSelectedKeys]);
 	};
+	function updateTableRowData(updateCode:number, target?:IModifyType|number) {
+		if (updateCode === 0 || updateCode === 1) {
+			setColCount(target as number)
+			let rowData = createTableByRowAndCol(target as number, rowCount);		
+			syncTableData(rows, rowData);
+			setRows(rowData);
+			updateFormBlockData(store, props, (v) => v.props[(option as any).field[5]] = rowData);
+		} else if (updateCode === 2) {
+			const {x, y, type, value} = target as IModifyType;
+			if (rows.length > 0 && y !== undefined && x !== undefined) {
+				const rowData = deepCopy(rows);
+				if (type == 'label') rowData[x].cells[y].label = value;
+				else if (type == 'colSpan') rowData[x].cells[y].cspan = value;
+				else if (type == 'rowSpan') rowData[x].cells[y].rspan = value;
+				setRows(rowData);
+				updateFormBlockData(store, props, (v) => v.props[(option as any).field[5]] = rowData);		
+			}
+		} else if (updateCode === 3) {
+			
+		}
+	}
 
 	return (
 		<div>
@@ -124,13 +154,15 @@ const MBorder = (props: MBorderProps) => {
 						: <InputNumber defaultValue={colCount} min={1} onChange={(val)=>{
 							setColCount(val);
 							updateFormBlockData(store, props, (v) => v.props[(option as any).field[4]] = val);
+							updateTableRowData(0);
 						}} />
 					}
 				</Col>
 				<Col span={6} title={'列数'} style={{ lineHeight: '30px' }}>
 					<InputNumber defaultValue={rowCount} min={1} onChange={(val)=>{
 						setRowCount(val);
-						updateFormBlockData(store, props, (v) => v.props[(option as any).field[3]] = val);
+						updateFormBlockData(store, props, (v) => v.props[(option as any).field[3]] = val);						
+						updateTableRowData(1);
 					}} />
 				</Col>
 			</Row>
@@ -153,22 +185,35 @@ const MBorder = (props: MBorderProps) => {
 					{(option as any)?.label2 || '修改'}：
 				</Col>
 				<Col span={4} title={'行号'} style={{ lineHeight: '30px' }}>
-					<Select onChange={(v)=>setColNo(v)} options={forkCountArray(colCount).map((e, i) => ({
+					<Select onChange={(v:number)=>setColNo(v)} options={forkCountArray(colCount).map((e, i) => ({
 						value: i,
 						label: i+1,
 					}))}></Select>
 				</Col>
 				<Col span={4} title={'列号'} style={{ lineHeight: '30px' }}>
-					<Select onChange={(v)=>setRowNo(v)} options={forkCountArray(rowCount).map((e, i) => ({
+					<Select onChange={(v:number)=>setRowNo(v)} options={forkCountArray(rowCount).map((e, i) => ({
 						value: i,
 						label: i+1,
 					}))}></Select>
 				</Col>
 				<Col span={10} title={'内容'} style={{ lineHeight: '30px' }}>
 					<Input onChange={(e)=>{
-						console.log('--', colNo,rowNo, e.target.value)
-						updateFormBlockData(store, props, (v) => v.props[(option as any).field[6]] = {
-							y: colNo, x: rowNo, label: e.target.value
+						updateTableRowData(2, {
+							y: colNo, x: rowNo, type: 'label', value: e.target.value
+						});
+					}}/>
+				</Col>
+				<Col span={7} title={'合并行'} style={{ lineHeight: '30px' }}>
+					<InputNumber min={0} onChange={(e)=>{
+						updateTableRowData(2, {
+							y: colNo, x: rowNo, type: 'colSpan', value: e
+						});
+					}}/>
+				</Col>
+				<Col span={7} title={'合并列'} style={{ lineHeight: '30px' }}>
+					<InputNumber min={0} onChange={(e)=>{
+						updateTableRowData(2, {
+							y: colNo, x: rowNo, type: 'rowSpan', value: e
 						});
 					}}/>
 				</Col>
