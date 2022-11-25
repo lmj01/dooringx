@@ -88,9 +88,22 @@ function TableComponent(pr: ComponentRenderConfigProps) {
 			})
 			tmp.push({cells:tmpRow});
 		})
-		saveTableData(tmp);
+		console.log('-232', c1, c2, tmp)
+		saveTableData(tmp, true);
 	}
-	function saveTableData(tmp:Array<ISingleRow>) {
+	function saveTableData(tmp:Array<ISingleRow>, changeSize:boolean) {
+		if (changeSize) {
+			for (let i = 0; i < rows.length; i++) {
+				let rowCells = rows[i].cells;
+				for (let j = 0; j < rowCells.length; j++) {
+					const {x, y, label} = rowCells[j];
+					console.log('--', x, y, label)
+					if (i < tmp.length && j < tmp[i].cells.length) {
+						tmp[i].cells[j].label = label;
+					}
+				}
+			}
+		}
 		setRows(tmp);
 		props.tableRow = tmp;
 		updateRegistBlockData(pr);
@@ -101,7 +114,8 @@ function TableComponent(pr: ComponentRenderConfigProps) {
 		if (rows.length > 0 && y !== undefined && x !== undefined) {
 			const rowData = deepCopy(rows);
 			rowData[x].cells[y].label = label;
-			saveTableData(rowData);
+			saveTableData(rowData, false);
+			props.tableCell = {};
 		}
 	}, [props.tableCell])
 
