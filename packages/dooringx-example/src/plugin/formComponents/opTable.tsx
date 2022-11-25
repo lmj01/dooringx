@@ -6,7 +6,7 @@ import { UserConfig } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { CreateOptionsRes } from 'dooringx-lib/dist/core/components/formTypes';
 import { IBlockType } from 'dooringx-lib/dist/core/store/storetype';
-import { updateBlockData } from './helper';
+import { updateBlockData } from '../helper/update';
 
 interface MBorderProps {
 	data: CreateOptionsRes<FormMap, 'opTable'>;

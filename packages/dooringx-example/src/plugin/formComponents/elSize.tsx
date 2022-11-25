@@ -6,7 +6,7 @@ import { FormMap } from '../formTypes';
 import { CreateOptionsRes } from 'dooringx-lib/dist/core/components/formTypes';
 import { IBlockType } from 'dooringx-lib/dist/core/store/storetype';
 import { locale } from 'dooringx-lib';
-import { updateBlockData } from './helper';
+import { updateBlockData } from '../helper/update';
 
 interface MSizeProps {
 	data: CreateOptionsRes<FormMap, 'elSize'>;

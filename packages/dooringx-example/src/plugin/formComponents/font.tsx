@@ -5,7 +5,7 @@ import { UserConfig, ColorPicker } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { CreateOptionsRes } from 'dooringx-lib/dist/core/components/formTypes';
 import { IBlockType } from 'dooringx-lib/dist/core/store/storetype';
-import { updateBlockData } from './helper';
+import { updateBlockData } from '../helper/update';
 
 interface MFontProps {
 	data: CreateOptionsRes<FormMap, 'font'>;

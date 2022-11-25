@@ -1,11 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-	createComponent,
-	createPannelOptions,
-} from 'dooringx-lib';
+import { createComponent, createPannelOptions } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { ComponentRenderConfigProps } from 'dooringx-lib/dist/core/components/componentItem';
-import { ICell, IGridRow, ISingleRow, ITableColumn } from './table';
+import { ICell, IGridRow, ISingleRow, ITableColumn } from '../helper/table';
 import { forkCountArray } from '../utils';
 
 function TableColumn({columns, showHeader}:ITableColumn) {
