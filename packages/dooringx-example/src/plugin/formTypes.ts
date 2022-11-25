@@ -36,8 +36,6 @@ export interface ElementBorderType extends BaseType {
 	editWidth: boolean;
 }
 
-export interface TableType extends BaseType {
-}
 export interface FontType extends BaseType {
 	color?: string;
 	fontSize:number;
@@ -58,7 +56,6 @@ export interface FormMap {
 	elPosition: ElementPositionType;
 	elSize: ElementSizeType;
 	elBorder: ElementBorderType;
-	table: TableType;
 	font: FontType;
 	opTitle: OpTitleType;
 	opTable: OpTableType;
