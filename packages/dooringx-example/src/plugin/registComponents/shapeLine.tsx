@@ -2,18 +2,15 @@ import { useState, useEffect } from 'react';
 import { ComponentRenderConfigProps } from '../../../../dooringx-lib/dist/core/components/componentItem';
 import { ComponentItemFactory, createPannelOptions } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
+import { colorToString } from '../utils';
 
 
 function ShapeLineComponent(pr: ComponentRenderConfigProps) {
 	const data = pr.data;
 	const props = data.props;
-	const [color, setColor] = useState(props.color);
+	const [color, setColor] = useState(props.borderColor);
 	useEffect(()=>{
-		if (typeof props.borderColor === 'string') setColor(props.borderColor);
-		else {
-			const {r,g,b,a} = props.borderColor;
-			setColor(`rgba(${r},${g},${b},${a})`);
-		}
+		setColor(colorToString(props.borderColor));
 	}, [props.borderColor]);
 	return (
 		<div

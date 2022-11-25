@@ -1,5 +1,5 @@
 
-import React, { useMemo, memo } from 'react';
+import { useMemo, memo } from 'react';
 import { InputNumber, Row, Col } from 'antd';
 import { deepCopy, UserConfig } from 'dooringx-lib';
 import { FormMap } from '../formTypes';

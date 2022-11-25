@@ -1,83 +1,108 @@
-import { Table } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
 	createComponent,
 	createPannelOptions,
-	useDynamicAddEventCenter,
 } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { ComponentRenderConfigProps } from 'dooringx-lib/dist/core/components/componentItem';
+import { ICell, IGridRow, ISingleRow, ITableColumn } from './table';
+import { forkCountArray } from '../utils';
 
+function TableColumn({columns, showHeader}:ITableColumn) {
+	if (showHeader) {
+		return (
+			<thead>
+				<tr>
+					{columns.map((col,index)=>{
+						return <th key={index}>{col.label}</th>
+					})}
+				</tr>
+			</thead>
+		)
+	}
+	return null;
+}
+function TableFooter({footers}:{footers:Array<string>}) {
+	return (
+		<footer>
+			<tr>
+				{footers.map((footer, index)=>{
+					return <th key={index}>{footer}</th>
+				})}
+			</tr>
+		</footer>
+	)
+}
+function TableSingleRow({cells}:ISingleRow) {
+	return (
+		<tr>
+			{cells.map((row, index)=>{
+				return <td key={index}>{row.label}</td>
+			})}
+		</tr>
+	)
+}
+function TableRows({rows}:IGridRow) {
+	return (
+		<tbody>
+			{rows.map((row,index)=>{
+				return <TableSingleRow key={index} cells={row.cells} />
+			})}
+		</tbody>
+	)
+}
 function TableComponent(pr: ComponentRenderConfigProps) {
-	const props = pr.data.props;
-	const eventCenter = useMemo(() => {
-		return pr.config.getEventCenter();
-	}, [pr.config]);
+	const props = pr.data.props;	
 
-	useDynamicAddEventCenter(pr, `${pr.data.id}-init`, '初始渲染时机'); //注册名必须带id 约定！
-	useDynamicAddEventCenter(pr, `${pr.data.id}-click`, '点击执行时机');
-	useEffect(() => {
-		// 模拟抛出事件
-		if (pr.context === 'preview') {
-			eventCenter.runEventQueue(`${pr.data.id}-init`, pr.config);
-		}
-	}, [eventCenter, pr.config, pr.context, pr.data.id]);
+	const [columns, setColumns] = useState<Array<ICell>>([]);
+	useEffect(()=> {
+		const tmp = props.tableColumn.map((e:string,i:number)=>({x:i,y:0,label:e} as ICell));
+		setColumns(tmp)
+		updateColumnAndRow();
+	}, [props.tableColumn]);
 
-	const columns = [
-		{
-		  title: 'Name',
-		  dataIndex: 'name',
-		  key: 'name',
-		  width: '80',
-		},
-		{
-		  title: 'Age',
-		  dataIndex: 'age',
-		  key: 'age',
-		  width: '80',
-		},
-		{
-		  title: 'Address',
-		  dataIndex: 'address',
-		  key: 'address',
-		  width: '80',
-		},
-	];
-	const dataSource = [
-		{
-		  key: '1',
-		  name: 'Mike',
-		  age: 32,
-		  address: '10 Downing Street',
-		},
-		{
-		  key: '2',
-		  name: 'John',
-		  age: 42,
-		  address: '10 Downing Street',
-		},
-	];
+	useEffect(()=>{
+		updateColumnAndRow();
+	}, [props.tableRowCount, props.tableColCount]);
+
+	
+	const [ccount, setCcount] = useState<number>(0);
+	const [header, setHeader] = useState(props.tableShowHeader);
+	useEffect(()=> {
+		setHeader(props.tableShowHeader)
+		updateColumnAndRow();
+	}, [props.tableShowHeader]);
+
+	// const [footers, setFooters] = useState(['footer1','footer2']);
+	const [rows, setRows] = useState<Array<ISingleRow>>([]);
+
+	function updateColumnAndRow() {
+		let c1 = props.tableRowCount;
+		let c2 = props.tableShowHeader ? props.tableColumn.length : props.tableColCount;
+		setCcount(c2);
+		const arrRow = forkCountArray(c1);
+		const arrCol = forkCountArray(c2);
+		let tmp:Array<ISingleRow> = [];
+		arrRow.map((r,ir) => {			
+			let tmpRow:Array<ICell> = [];
+			arrCol.map((c,ic)=>{
+				tmpRow.push({x:ir,y:ic,label:`${ir}-${ic}`});
+			})
+			tmp.push({cells:tmpRow});
+		})
+		setRows(tmp);	
+	}
 
 	return (
-		<Table
-			style={{
-				width: pr.data.width ? pr.data.width : props.sizeData[0],
-				height: pr.data.height ? pr.data.height : props.sizeData[1],
-				borderRadius: props.borderRadius + 'px',
-				border: `${props.borderData.borderWidth}px ${props.borderData.borderStyle} ${props.borderData.borderColor}`,
-				backgroundColor: props.backgroundColor,
-				color: props.fontData.color,
-				fontSize: props.fontData.fontSize,
-				fontWeight: props.fontData.fontWeight,
-				fontStyle: props.fontData.fontStyle,
-				textDecoration: props.fontData.textDecoration,
-				lineHeight: props.lineHeight,
-			}}
-			tableLayout={'fixed'}
-			dataSource={dataSource}
-			columns={columns}
-		>
-		</Table>
+		<table className={'mj-table'} style={{
+			width: pr.data.width ? pr.data.width : props.sizeData[0],
+			height: pr.data.height ? pr.data.height : props.sizeData[1],
+		}}>
+			<colgroup span={ccount}></colgroup>
+			<TableColumn columns={columns} showHeader={header} />
+			<TableRows rows={rows} />
+			{/* <TableFooter footers={footers} /> */}
+      </table>
 	);
 }
 
@@ -91,6 +116,10 @@ const RegTable = createComponent({
 			}),
 			createPannelOptions<FormMap, 'elSize'>('elSize', {
 				label: '大小'
+			}),
+			createPannelOptions<FormMap, 'opTable'>('opTable', {
+				label: '表格',
+				field:['tableType','tableColumn','tableShowHeader','tableRowCount','tableColCount','tableRow']
 			}),
 		],
 	},
@@ -113,8 +142,14 @@ const RegTable = createComponent({
 				color: 'rgba(255,255,255,1)',
 				fontWeight: 'normal',
 			},
+			tableType: '',
+			tableColumn: [],
+			tableShowHeader:true,
+			tableRow: [],
+			tableRowCount: 3,
+			tableColCount: 3,
 		},
-		width: 400,
+		width: 200,
 		height: 200,
 		rotate: {
 			canRotate: true,

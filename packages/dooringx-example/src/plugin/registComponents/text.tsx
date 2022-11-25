@@ -1,20 +1,46 @@
-import { ComponentItemFactory, createPannelOptions } from 'dooringx-lib';
-import { Input } from 'antd';
+import { useState, useEffect } from 'react';
+import { createPannelOptions, createComponent } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { ComponentRenderConfigProps } from '../../../../dooringx-lib/dist/core/components/componentItem';
+import { colorToString } from '../utils';
 
 
 function InputTtextComponent(pr: ComponentRenderConfigProps) {
 	const props = pr.data.props;
+	const [color, setColor] = useState(props.color);
+	useEffect(()=>{
+		setColor(colorToString(props.color));
+	}, [props.color]);
+	const [size, setSize] = useState(props.fontSize);
+	useEffect(()=>{
+		setSize(props.fontSize);
+	}, [props.fontSize]);
+	const [weight, setWeight] = useState<any>();
+	const [style, setStyle] = useState<any>();
+	const [decoration, setDecoration] = useState<any>();
+	useEffect(()=>{
+		if (Array.isArray(props.styles)) {
+			setWeight(props.styles.includes('bold')?'bold':'normal');
+			setStyle(props.styles.includes('italic')?'italic':'normal');
+			setDecoration(props.styles.includes('underline')?'underline':'none');
+		}
+	}, [props.styles]);
+	
 	return (
-		<div>{props.text}</div>
+		<div style={{
+			color:color,
+			fontSize:size,
+			fontWeight:weight,
+			fontStyle:style,
+			textDecoration:decoration,
+		}}>{props.text}</div>
 	);
 }
 
-const DInputText = new ComponentItemFactory(
-	'inputText', // component-id
-	'文本', // label literal
-	{ // right-part option style
+const DInputText = createComponent({
+	name: 'inputText', // component-id
+	display: '文本', // label literal
+	props: { // right-part option style
 		style: [
 			createPannelOptions<FormMap, 'input'>('input', {
 				receive: 'text',
@@ -26,18 +52,28 @@ const DInputText = new ComponentItemFactory(
 			createPannelOptions<FormMap, 'elSize'>('elSize', {
 				label: '大小'
 			}),
+			createPannelOptions<FormMap, 'font'>('font', {
+				label: '字号',
+				color: 'rgba(0,0,0,1)',
+				fontSize:14,
+				styles:[],
+				field: ['fontSize','color','styles'],
+			}),
 		],
 	},
-	{ // initial option value
+	initData: { // initial option value
 		props: {
 			text: '文本',
+			color: 'rgba(0,0,0,1)',
+			fontSize: 14,
+			styles: [],
 		},
 		width: 200,
 		height: 55,
 	},
-	(data, context, store, config) => {
-	return <InputTtextComponent data={data} context={context} store={store} config={config}></InputTtextComponent>;
+	render: (data, context, store, config) => {
+		return <InputTtextComponent data={data} context={context} store={store} config={config}></InputTtextComponent>;
 	},	
-	true,
-);
+	resize: true,
+});
 export default DInputText;

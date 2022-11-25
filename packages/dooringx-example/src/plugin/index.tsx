@@ -8,7 +8,7 @@
 
 import { InitConfig, LeftDataPannel } from 'dooringx-lib';
 import { LeftRegistComponentMapItem } from 'dooringx-lib/dist/core/crossDrag';
-import { ContainerOutlined, PlayCircleOutlined, HighlightOutlined, TableOutlined, LineOutlined, MessageOutlined } from '@ant-design/icons';
+import { ContainerOutlined, PlayCircleOutlined, HighlightOutlined, TableOutlined, LineOutlined, MessageOutlined, FieldNumberOutlined } from '@ant-design/icons';
 import commandModules from './commanderModules';
 import { functionMap } from './functionMap';
 import { Formmodules } from './formComponentModules';
@@ -60,6 +60,14 @@ const LeftRegistMap: LeftRegistComponentMapItem[] = [
 		imgCustom: <TableOutlined />,
 		displayName: '表格',
 		urlFn: () => import('./registComponents/table'),
+	},
+	{
+		type: 'basic',
+		component: 'title1',
+		img: 'icon-anniu',
+		imgCustom: <FieldNumberOutlined />,
+		displayName: '编号',
+		urlFn: () => import('./registComponents/title1'),
 	},
 ];
 
