@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
 	createComponent,
-	createPannelOptions,
+	createPannelOptions, deepCopy
 } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { ComponentRenderConfigProps } from 'dooringx-lib/dist/core/components/componentItem';
@@ -93,6 +93,17 @@ function TableComponent(pr: ComponentRenderConfigProps) {
 		setRows(tmp);	
 	}
 
+	useEffect(() => {
+		const {x, y, label} = props.tableCell;
+		const rowData = deepCopy(rows);
+		console.log('-cell-', rowData, props.tableCell)
+		if (rowData.length > 0 && y && x) {
+			const tmp = rowData[y].cells.filter(e=>e.x==x && e.y==y)[0];
+			if (tmp) tmp.label = label;
+			setRows(rowData);
+		}
+	}, [props.tableCell])
+
 	return (
 		<table className={'mj-table'} style={{
 			width: pr.data.width ? pr.data.width : props.sizeData[0],
@@ -119,7 +130,7 @@ const RegTable = createComponent({
 			}),
 			createPannelOptions<FormMap, 'opTable'>('opTable', {
 				label: '表格',
-				field:['tableType','tableColumn','tableShowHeader','tableRowCount','tableColCount','tableRow']
+				field:['tableType','tableColumn','tableShowHeader','tableRowCount','tableColCount','tableRow','tableCell']
 			}),
 		],
 	},
@@ -148,6 +159,7 @@ const RegTable = createComponent({
 			tableRow: [],
 			tableRowCount: 3,
 			tableColCount: 3,
+			tableCell: {},
 		},
 		width: 200,
 		height: 200,

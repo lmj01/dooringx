@@ -1,12 +1,13 @@
 
-import { useMemo, memo, useState } from 'react';
-import { Row, Col, Transfer, Select, Switch, InputNumber } from 'antd';
+import { useMemo, memo, useState, useEffect } from 'react';
+import { Row, Col, Transfer, Select, Switch, InputNumber, Input } from 'antd';
 import type { TransferDirection } from 'antd/es/transfer';
 import { UserConfig } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { CreateOptionsRes } from 'dooringx-lib/dist/core/components/formTypes';
 import { IBlockType } from 'dooringx-lib/dist/core/store/storetype';
 import { updateBlockData } from './helper';
+import { forkCountArray } from '../utils';
 
 interface MBorderProps {
 	data: CreateOptionsRes<FormMap, 'opTable'>;
@@ -19,6 +20,19 @@ interface TableFieldType {
 	label:string;
 }
 
+function ComSelect({count, onChange}:any) {
+	const ss = forkCountArray(count);
+	return (
+		<Select onChange={onChange}>
+			{
+				ss.map((e,i)=>(
+					<Select.Option value={i}>{i+1}</Select.Option>
+				))
+			}
+		</Select>
+	)
+}
+
 const MBorder = (props: MBorderProps) => {
 	const option = useMemo(() => {
 		return props.data?.option || {};
@@ -27,8 +41,13 @@ const MBorder = (props: MBorderProps) => {
 	const [tblType, setTblType] = useState<string>(props.current.props[(option as any).field[0]]);
 	const [showHeader, setShowHeader] = useState<boolean>(props.current.props[(option as any).field[2]]);
 	const [rowCount, setRowCount] = useState<number>(props.current.props[(option as any).field[3]]);
-	const [colCount, setColCount] = useState<number>(props.current.props[(option as any).field[4]]);
-
+	const [colCount, setColCount] = useState<number>(
+		props.current.props[(option as any).field[2]] ? props.current.props[(option as any).field[1]].length : props.current.props[(option as any).field[4]]
+	);
+	
+	const [rowNo, setRowNo] = useState<number>(0);
+	const [colNo, setColNo] = useState<number>(0);
+	
 	const [targetKeys, setTargetKeys] = useState<Array<string>>(props.current.props[(option as any).field[1]]);
 	const [selectedKeys, setSelectedKeys] = useState<Array<string>>([]);
 	const store = props.config.getStore();
@@ -76,6 +95,8 @@ const MBorder = (props: MBorderProps) => {
 		} else if (direction === 'left') {
 			setTargetKeys(newTargetKeys);
 		}
+		if (showHeader) setColCount(newTargetKeys.length);
+		else setColCount(props.current.props[(option as any).field[4]]);;
 	}
 	const handleSelectChange = (sourceSelectedKeys: string[], targetSelectedKeys: string[]) => {
 		// setSelectedKeys([...targetSelectedKeys, ...sourceSelectedKeys]);
@@ -131,15 +152,25 @@ const MBorder = (props: MBorderProps) => {
 				<Col span={6} style={{ lineHeight: '30px' }}>
 					{(option as any)?.label2 || '修改'}：
 				</Col>
-				<Col span={7} style={{ lineHeight: '30px' }}>
-					{/* <Select defaultValue={tblType} disabled={!showHeader} onChange={(val, opt:any) => {
-						setTblType(val);
-						setDatasource(opt.sub)
-						updateBlockData(store, props, (v) => v.props[(option as any).field[0]] = val);
-					}} options={()=>{
-						value:'tblReport', label:'报告表',
-						return [];
-					}} /> */}
+				<Col span={4} title={'行号'} style={{ lineHeight: '30px' }}>
+					<Select onChange={(v)=>setColNo(v)} options={forkCountArray(colCount).map((e, i) => ({
+						value: i,
+						label: i+1,
+					}))}></Select>
+				</Col>
+				<Col span={4} title={'列号'} style={{ lineHeight: '30px' }}>
+					<Select onChange={(v)=>setRowNo(v)} options={forkCountArray(rowCount).map((e, i) => ({
+						value: i,
+						label: i+1,
+					}))}></Select>
+				</Col>
+				<Col span={10} title={'内容'} style={{ lineHeight: '30px' }}>
+					<Input onChange={(e)=>{
+						console.log('--', colNo,rowNo, e.target.value)
+						updateBlockData(store, props, (v) => v.props[(option as any).field[6]] = {
+							y: colNo, x: rowNo, label: e.target.value
+						});
+					}}/>
 				</Col>
 			</Row>
 		</div>
