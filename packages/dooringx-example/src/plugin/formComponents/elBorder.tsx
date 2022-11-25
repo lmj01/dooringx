@@ -5,7 +5,7 @@ import { UserConfig, ColorPicker } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { CreateOptionsRes } from 'dooringx-lib/dist/core/components/formTypes';
 import { IBlockType } from 'dooringx-lib/dist/core/store/storetype';
-import { updateBlockData } from '../helper/update';
+import { updateFormBlockData } from '../helper/update';
 
 interface MBorderProps {
 	data: CreateOptionsRes<FormMap, 'elBorder'>;
@@ -29,7 +29,7 @@ const MBorder = (props: MBorderProps) => {
 			</Col>
 			<Col span={6} style={{ lineHeight: '30px' }}>
 				<Select defaultValue={props.current.props['borderStyle']} onChange={(val) => {
-						updateBlockData(store, props, (v) => v.props['borderStyle'] = val);
+						updateFormBlockData(store, props, (v) => v.props['borderStyle'] = val);
 					}} options={[
 						{value:'solid', label:'实线'},
 						{value:'dotted', label:'圆点'},
@@ -51,7 +51,7 @@ const MBorder = (props: MBorderProps) => {
 			</Col> */}
 			<Col span={4} style={{ lineHeight: '30px', margin:'auto' }}>
 				<ColorPicker initColor={props.current.props['borderColor']} onChange={(val:any)=>{		
-					updateBlockData(store, props, (v) => v.props['borderColor'] = val);
+					updateFormBlockData(store, props, (v) => v.props['borderColor'] = val);
 				}} />
 			</Col>
 		</Row>

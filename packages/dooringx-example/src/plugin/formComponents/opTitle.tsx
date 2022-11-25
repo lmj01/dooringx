@@ -5,7 +5,7 @@ import { UserConfig } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { CreateOptionsRes } from 'dooringx-lib/dist/core/components/formTypes';
 import { IBlockType } from 'dooringx-lib/dist/core/store/storetype';
-import { updateBlockData } from '../helper/update';
+import { updateFormBlockData } from '../helper/update';
 
 interface MBorderProps {
 	data: CreateOptionsRes<FormMap, 'opTitle'>;
@@ -46,13 +46,13 @@ const MBorder = (props: MBorderProps) => {
 			<Col span={9} style={{ lineHeight: '30px' }}>
 				<Select defaultValue={props.current.props[(option as any).field[0]]} onChange={(val, opt:any) => {
 					setSub(opt.sub)
-					updateBlockData(store, props, (v) => v.props[(option as any).field[0]] = val);
-					updateBlockData(store, props, (v) => v.props[(option as any).field[1]] = '');
+					updateFormBlockData(store, props, (v) => v.props[(option as any).field[0]] = val);
+					updateFormBlockData(store, props, (v) => v.props[(option as any).field[1]] = '');
 				}} options={listTitle} />
 			</Col>
 			<Col span={9} style={{ lineHeight: '20px', margin:'auto' }}>
 				<Select defaultValue={props.current.props[(option as any).field[1]]} onChange={(val, opt:any) => {
-					updateBlockData(store, props, (v) => v.props[(option as any).field[1]] = val);
+					updateFormBlockData(store, props, (v) => v.props[(option as any).field[1]] = val);
 				}} options={sub} />
 			</Col>
 		</Row>

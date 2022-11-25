@@ -6,7 +6,7 @@ import { FormMap } from '../formTypes';
 import { CreateOptionsRes } from 'dooringx-lib/dist/core/components/formTypes';
 import { IBlockType } from 'dooringx-lib/dist/core/store/storetype';
 import { locale } from 'dooringx-lib';
-import { updateBlockData } from '../helper/update';
+import { updateFormBlockData } from '../helper/update';
 
 interface MSizeProps {
 	data: CreateOptionsRes<FormMap, 'elSize'>;
@@ -28,13 +28,13 @@ const MSize = (props: MSizeProps) => {
 			<Col span={9} style={{ lineHeight: '30px' }}>
 				{locale.replaceLocale('form.size.width', 'Width', props.config)}：
 				<InputNumber defaultValue={props.current['width']} onChange={(val) => {
-						updateBlockData(store, props, (v) => v['width'] = val);
+						updateFormBlockData(store, props, (v) => v['width'] = val);
 					}} />
 			</Col>
 			<Col span={9} style={{ lineHeight: '30px' }}>
 				{locale.replaceLocale('form.size.height', 'Height', props.config)}：
 				<InputNumber defaultValue={props.current['height']} onChange={(val) => {
-						updateBlockData(store, props, (v) => v['height'] = val);
+						updateFormBlockData(store, props, (v) => v['height'] = val);
 					}} />
 			</Col>
 		</Row>

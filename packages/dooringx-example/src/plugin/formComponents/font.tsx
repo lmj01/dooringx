@@ -5,7 +5,7 @@ import { UserConfig, ColorPicker } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { CreateOptionsRes } from 'dooringx-lib/dist/core/components/formTypes';
 import { IBlockType } from 'dooringx-lib/dist/core/store/storetype';
-import { updateBlockData } from '../helper/update';
+import { updateFormBlockData } from '../helper/update';
 
 interface MFontProps {
 	data: CreateOptionsRes<FormMap, 'font'>;
@@ -30,19 +30,19 @@ const MFont = (props: MFontProps) => {
 			</Col>
 			<Col span={7} title={'大小'} style={{ lineHeight: '30px' }}>
 				<InputNumber defaultValue={props.current.props[(option as any).field[0]]} onChange={(val) => {
-						updateBlockData(store, props, (v) => {
+						updateFormBlockData(store, props, (v) => {
 							v.props[(option as any).field[0]] = val;
 						});
 					}} />
 			</Col>
 			<Col span={7} style={{ lineHeight: '30px' }}>
 				<Checkbox.Group options={fontOptions} defaultValue={[]} onChange={(val)=>{
-					updateBlockData(store, props, (v) => v.props[(option as any).field[2]] = val);
+					updateFormBlockData(store, props, (v) => v.props[(option as any).field[2]] = val);
 				}} />
 			</Col>
 			<Col span={4} title={'字体颜色'} style={{ lineHeight: '30px', margin:'auto' }}>
 				<ColorPicker initColor={props.current.props[(option as any).field[1]]} onChange={(val:any)=>{					
-					updateBlockData(store, props, (v) => v.props[(option as any).field[1]] = val);
+					updateFormBlockData(store, props, (v) => v.props[(option as any).field[1]] = val);
 				}} />
 			</Col>
 		</Row>

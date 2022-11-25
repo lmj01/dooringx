@@ -4,6 +4,7 @@ import { FormMap } from '../formTypes';
 import { ComponentRenderConfigProps } from 'dooringx-lib/dist/core/components/componentItem';
 import { ICell, IGridRow, ISingleRow, ITableColumn } from '../helper/table';
 import { forkCountArray } from '../helper/utils';
+import { updateRegistBlockData } from '../helper/update';
 
 function TableColumn({columns, showHeader}:ITableColumn) {
 	if (showHeader) {
@@ -87,17 +88,20 @@ function TableComponent(pr: ComponentRenderConfigProps) {
 			})
 			tmp.push({cells:tmpRow});
 		})
-		setRows(tmp);	
+		saveTableData(tmp);
+	}
+	function saveTableData(tmp:Array<ISingleRow>) {
+		setRows(tmp);
+		props.tableRow = tmp;
+		updateRegistBlockData(pr);
 	}
 
 	useEffect(() => {
 		const {x, y, label} = props.tableCell;
-		console.log('-cell-', props.tableCell, rows)
 		if (rows.length > 0 && y !== undefined && x !== undefined) {
 			const rowData = deepCopy(rows);
 			rowData[x].cells[y].label = label;
-			console.log('-23', rowData)
-			setRows(rowData);
+			saveTableData(rowData);
 		}
 	}, [props.tableCell])
 

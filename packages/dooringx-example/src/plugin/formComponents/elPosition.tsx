@@ -5,7 +5,7 @@ import { UserConfig } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { CreateOptionsRes } from 'dooringx-lib/dist/core/components/formTypes';
 import { IBlockType } from 'dooringx-lib/dist/core/store/storetype';
-import { updateBlockData } from '../helper/update';
+import { updateFormBlockData } from '../helper/update';
 interface MPositionProps {
 	data: CreateOptionsRes<FormMap, 'elPosition'>;
 	current: IBlockType;
@@ -37,13 +37,13 @@ const MPosition = (props: MPositionProps) => {
 			<Col span={9} style={{ lineHeight: '30px' }}>
 				X：
 				<InputNumber defaultValue={left} onChange={(val:number) => {
-						updateBlockData(store, props, (v) => v['left'] = val);
+						updateFormBlockData(store, props, (v) => v['left'] = val);
 					}} />
 			</Col>
 			<Col span={9} style={{ lineHeight: '30px' }}>
 				Y：
 				<InputNumber defaultValue={top} onChange={(val:number) => {
-					updateBlockData(store, props, (v) => v['top'] = val);
+					updateFormBlockData(store, props, (v) => v['top'] = val);
 					}} />
 			</Col>
 		</Row>

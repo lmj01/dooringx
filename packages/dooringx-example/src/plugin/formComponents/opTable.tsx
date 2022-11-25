@@ -6,7 +6,7 @@ import { UserConfig } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { CreateOptionsRes } from 'dooringx-lib/dist/core/components/formTypes';
 import { IBlockType } from 'dooringx-lib/dist/core/store/storetype';
-import { updateBlockData } from '../helper/update';
+import { updateFormBlockData } from '../helper/update';
 import { forkCountArray } from '../helper/utils';
 
 interface MBorderProps {
@@ -91,7 +91,7 @@ const MBorder = (props: MBorderProps) => {
 		if (direction === 'right') {
 			let tmp = [...targetKeys, ...moveKeys];
 			setTargetKeys(tmp);		
-			updateBlockData(store, props, (v) => v.props[(option as any).field[1]] = tmp);
+			updateFormBlockData(store, props, (v) => v.props[(option as any).field[1]] = tmp);
 		} else if (direction === 'left') {
 			setTargetKeys(newTargetKeys);
 		}
@@ -112,25 +112,25 @@ const MBorder = (props: MBorderProps) => {
 				<Col span={5} style={{ lineHeight: '30px' }}>
 					<Switch checkedChildren={'显示头'} unCheckedChildren={'关闭头'} defaultChecked={showHeader} onChange={(val) => {
 						setShowHeader(val);
-						updateBlockData(store, props, (v) => v.props[(option as any).field[2]] = val);
+						updateFormBlockData(store, props, (v) => v.props[(option as any).field[2]] = val);
 					}} />
 				</Col>
 				<Col span={7} title={'行数'} style={{ lineHeight: '30px' }}>
 					{ showHeader ? <Select defaultValue={tblType} disabled={!showHeader} onChange={(val, opt:any) => {
 							setTblType(val);
 							setDatasource(opt.sub)
-							updateBlockData(store, props, (v) => v.props[(option as any).field[0]] = val);
+							updateFormBlockData(store, props, (v) => v.props[(option as any).field[0]] = val);
 						}} options={listTable} />
 						: <InputNumber defaultValue={colCount} min={1} onChange={(val)=>{
 							setColCount(val);
-							updateBlockData(store, props, (v) => v.props[(option as any).field[4]] = val);
+							updateFormBlockData(store, props, (v) => v.props[(option as any).field[4]] = val);
 						}} />
 					}
 				</Col>
 				<Col span={6} title={'列数'} style={{ lineHeight: '30px' }}>
 					<InputNumber defaultValue={rowCount} min={1} onChange={(val)=>{
 						setRowCount(val);
-						updateBlockData(store, props, (v) => v.props[(option as any).field[3]] = val);
+						updateFormBlockData(store, props, (v) => v.props[(option as any).field[3]] = val);
 					}} />
 				</Col>
 			</Row>
@@ -167,7 +167,7 @@ const MBorder = (props: MBorderProps) => {
 				<Col span={10} title={'内容'} style={{ lineHeight: '30px' }}>
 					<Input onChange={(e)=>{
 						console.log('--', colNo,rowNo, e.target.value)
-						updateBlockData(store, props, (v) => v.props[(option as any).field[6]] = {
+						updateFormBlockData(store, props, (v) => v.props[(option as any).field[6]] = {
 							y: colNo, x: rowNo, label: e.target.value
 						});
 					}}/>
