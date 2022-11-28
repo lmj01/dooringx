@@ -8,7 +8,7 @@ import { CreateOptionsRes } from 'dooringx-lib/dist/core/components/formTypes';
 import { IBlockType } from 'dooringx-lib/dist/core/store/storetype';
 import { updateFormBlockData } from '../helper/update';
 import { forkCountArray } from '../helper/utils';
-import { createTableByRowAndCol, ICell, ISingleRow, syncTableData } from '../helper/table';
+import { createTableByRowAndCol, ICell, ISingleRow, syncTableData, updateTableSpanData } from '../helper/table';
 
 interface MBorderProps {
 	data: CreateOptionsRes<FormMap, 'opTable'>;
@@ -22,8 +22,8 @@ interface TableFieldType {
 }
 
 interface IModifyType {
-	x:number;
-	y:number;
+	col:number;
+	row:number;
 	type:string;
 	value:string|number;
 }
@@ -119,12 +119,15 @@ const MBorder = (props: MBorderProps) => {
 			setRows(rowData);
 			updateFormBlockData(store, props, (v) => v.props[(option as any).field[5]] = rowData);
 		} else if (updateCode === 2) {
-			const {x, y, type, value} = target as IModifyType;
-			if (rows.length > 0 && y !== undefined && x !== undefined) {
+			const {col, row, type, value} = target as IModifyType;
+			if (rows.length > 0 && row !== undefined && col !== undefined) {
 				const rowData = deepCopy(rows);
-				if (type == 'label') rowData[x].cells[y].label = value;
-				else if (type == 'colSpan') rowData[x].cells[y].cspan = value;
-				else if (type == 'rowSpan') rowData[x].cells[y].rspan = value;
+				if (type == 'label') rowData[row].cells[col].label = value;
+				else if (type == 'colSpan') {
+					updateTableSpanData(rowData, col, row, value as number, false);
+				} else if (type == 'rowSpan') {
+					updateTableSpanData(rowData, col, row, value as number, true);
+				}
 				setRows(rowData);
 				updateFormBlockData(store, props, (v) => v.props[(option as any).field[5]] = rowData);		
 			}
@@ -199,21 +202,21 @@ const MBorder = (props: MBorderProps) => {
 				<Col span={10} title={'内容'} style={{ lineHeight: '30px' }}>
 					<Input onChange={(e)=>{
 						updateTableRowData(2, {
-							y: colNo, x: rowNo, type: 'label', value: e.target.value
+							col: colNo, row: rowNo, type: 'label', value: e.target.value
 						});
 					}}/>
 				</Col>
 				<Col span={7} title={'合并行'} style={{ lineHeight: '30px' }}>
 					<InputNumber min={0} onChange={(e)=>{
 						updateTableRowData(2, {
-							y: colNo, x: rowNo, type: 'colSpan', value: e
+							col: colNo, row: rowNo, type: 'colSpan', value: e
 						});
 					}}/>
 				</Col>
 				<Col span={7} title={'合并列'} style={{ lineHeight: '30px' }}>
 					<InputNumber min={0} onChange={(e)=>{
 						updateTableRowData(2, {
-							y: colNo, x: rowNo, type: 'rowSpan', value: e
+							col: colNo, row: rowNo, type: 'rowSpan', value: e
 						});
 					}}/>
 				</Col>

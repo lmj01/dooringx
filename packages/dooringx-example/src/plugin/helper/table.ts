@@ -28,17 +28,45 @@ export interface IGridRow {
  * @param row 
  */
 export function createTableByRowAndCol(col:number, row:number) {
-    const arrCol = forkCountArray(col);
-    const arrRow = forkCountArray(row);
     let tmp:Array<ISingleRow> = [];
-    arrRow.map((r,ir) => {			
+    for (let i = 0; i < row; i++) {
         let tmpRow:Array<ICell> = [];
-        arrCol.map((c,ic)=>{
-            tmpRow.push({x:ir,y:ic,label:`${ir}-${ic}`});
-        })
+        for (let j = 0; j < col; j++) {
+            tmpRow.push({x:i, y:j,label:`${i}-${j}`})
+        }
         tmp.push({cells:tmpRow});
-    })
+    }
     return tmp;
+}
+/**
+ * 
+ * @param table 
+ * @param col 
+ * @param row 
+ * @param span 
+ * @param isRow 
+ */
+export function updateTableSpanData(table:Array<ISingleRow>, col:number, row:number, span:number, isRow:boolean) {
+    if (isRow) {
+        if (span > 1) {
+            // 删除
+            table[row].cells[col].cspan = span;
+            table[row].cells.splice(col+1, span-1);
+        } else if (span < 2) {
+            // 增加
+        }
+    } else {
+        if (span > 1) {
+            // 删除
+            table[row].cells[col].rspan = span;
+            for (let i = 1; i < span; i++) {
+                table[row+1].cells.splice(col, 1);
+            }
+        } else {
+            // 增加
+        }
+    } 
+    console.log('-update span-', col,row,span,table)
 }
 
 /**
