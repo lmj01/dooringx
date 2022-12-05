@@ -4,6 +4,9 @@ export interface ICell {
     label: string;
     cspan: number; // default 1
     rspan: number; // default 1
+    width?: number;
+    height?: number;
+    style: {[key:string]:any};
 }
 
 export interface ITableColumn {
@@ -18,12 +21,19 @@ export interface ISingleRow {
 export interface IGridRow {
     rows:Array<ISingleRow>;
 }
-type SpanType = 'colSpan' | 'rowSpan' | 'label';
-export interface IModifyType {
-	col:number;
-	row:number;
+interface ICellType {
+    col: number;
+    row: number;
+}
+export type SpanType = 'colSpan' | 'rowSpan';
+export interface ISpanType extends ICellType {
 	type: SpanType;
-	value:string|number;
+	value:number;
+}
+export type StyleType = 'textAlign' | 'textContent'; 
+export interface IStyleType extends ICellType {
+    type: StyleType;
+    value:string;
 }
 
 /**
@@ -31,7 +41,7 @@ export interface IModifyType {
  * @param col 
  * @param row 
  */
-export function createTableByRowAndCol(col:number, row:number, spanInfo:Array<IModifyType>) {
+export function createTableByRowAndCol(col:number, row:number, spanInfo:Array<ISpanType>) {
     console.log('-create table-', col, row, spanInfo)
     let tmp:Array<ISingleRow> = [];
     for (let i = 0; i < row; i++) {
@@ -45,6 +55,7 @@ export function createTableByRowAndCol(col:number, row:number, spanInfo:Array<IM
                 label:`${i}-${j}`, 
                 rspan: rspan, 
                 cspan: cspan,
+                style: {},
             });
         }
         tmp.push({cells:tmpRow});
@@ -90,17 +101,28 @@ export function updateTableSpanData(table:Array<ISingleRow>, col:number, row:num
  * @param table 
  * @param target 
  */
-export function updateTableAfterModify(table:Array<ISingleRow>, target:IModifyType) {
-    const {col, row, type, value} = target as IModifyType;
-    if (type == 'label') {
-        // 修改值
-        table[row].cells[col].label = value as string;
-    } else if (type == 'colSpan') {
+export function updateTableAfterModify(table:Array<ISingleRow>, target:ISpanType) {
+    const {col, row, type, value} = target;
+    if (type == 'colSpan') {
         // 重构表格
         updateTableSpanData(table, col, row, value as number, false);
     } else if (type == 'rowSpan') {
         // 重构表格
         updateTableSpanData(table, col, row, value as number, true);
+    }
+}
+
+export function updateTableCell(table:Array<ISingleRow>, target: IStyleType) {
+    const {col, row, type, value} = target;
+    if (value.length < 1) return;
+    const tmp = table[row].cells[col];
+    if (type === 'textContent') {
+        tmp.label = value;
+    } else {
+        if (tmp.style === undefined) tmp.style = {};
+        if (type === 'textAlign') {
+            tmp.style[type] = value;
+        }
     }
 }
 

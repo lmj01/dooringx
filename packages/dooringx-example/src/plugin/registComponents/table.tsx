@@ -1,10 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
-import { createComponent, createPannelOptions, deepCopy } from 'dooringx-lib';
+import { createComponent, createPannelOptions } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { ComponentRenderConfigProps } from 'dooringx-lib/dist/core/components/componentItem';
-import { ICell, IGridRow, ISingleRow, ITableColumn } from '../helper/table';
-import { forkCountArray } from '../helper/utils';
-import { updateRegistBlockData } from '../helper/update';
+import { IGridRow, ISingleRow, ITableColumn } from '../helper/table';
 
 function TableColumn({columns, showHeader}:ITableColumn) {
 	if (showHeader) {
@@ -35,7 +32,7 @@ function TableSingleRow({cells}:ISingleRow) {
 	return (
 		<tr>
 			{cells.map((row, index)=>{
-				return <td colSpan={row.cspan} rowSpan={row.rspan} key={index}>{row.label}</td>
+				return <td colSpan={row.cspan} rowSpan={row.rspan} key={index} style={row.style}>{row.label}</td>
 			})}
 		</tr>
 	)

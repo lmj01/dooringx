@@ -142,11 +142,7 @@ export default function IndexPage() {
 					>
 						远程组件
 					</Button> */}
-					<Button
-						onClick={() => {
-							createAndDownloadFile('dooring.json');
-						}}
-					>
+					<Button onClick={() => createAndDownloadFile('form1.json')}>
 						保存模板
 					</Button>
 					<Button
