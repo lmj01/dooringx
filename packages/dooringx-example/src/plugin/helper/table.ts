@@ -1,12 +1,9 @@
-import { forkCountArray } from "./utils";
-
-
 export interface ICell {
-    x:number;
-    y:number;
-    label:string;
-    cspan?:number;
-    rspan?:number;
+    row: number; // row
+    col: number; // col
+    label: string;
+    cspan: number; // default 1
+    rspan: number; // default 1
 }
 
 export interface ITableColumn {
@@ -21,21 +18,40 @@ export interface ISingleRow {
 export interface IGridRow {
     rows:Array<ISingleRow>;
 }
+type SpanType = 'colSpan' | 'rowSpan' | 'label';
+export interface IModifyType {
+	col:number;
+	row:number;
+	type: SpanType;
+	value:string|number;
+}
 
 /**
  * 
  * @param col 
  * @param row 
  */
-export function createTableByRowAndCol(col:number, row:number) {
+export function createTableByRowAndCol(col:number, row:number, spanInfo:Array<IModifyType>) {
+    console.log('-create table-', col, row, spanInfo)
     let tmp:Array<ISingleRow> = [];
     for (let i = 0; i < row; i++) {
         let tmpRow:Array<ICell> = [];
         for (let j = 0; j < col; j++) {
-            tmpRow.push({x:i, y:j,label:`${i}-${j}`})
+            let rspan = 1;
+            let cspan = 1;
+            tmpRow.push({
+                row: i, 
+                col: j, 
+                label:`${i}-${j}`, 
+                rspan: rspan, 
+                cspan: cspan,
+            });
         }
         tmp.push({cells:tmpRow});
     }
+    spanInfo.forEach((info) => {
+        updateTableSpanData(tmp, info.col, info.row, info.value as number, info.type == 'rowSpan');
+    })
     return tmp;
 }
 /**
@@ -71,18 +87,38 @@ export function updateTableSpanData(table:Array<ISingleRow>, col:number, row:num
 
 /**
  * 
+ * @param table 
+ * @param target 
+ */
+export function updateTableAfterModify(table:Array<ISingleRow>, target:IModifyType) {
+    const {col, row, type, value} = target as IModifyType;
+    if (type == 'label') {
+        // 修改值
+        table[row].cells[col].label = value as string;
+    } else if (type == 'colSpan') {
+        // 重构表格
+        updateTableSpanData(table, col, row, value as number, false);
+    } else if (type == 'rowSpan') {
+        // 重构表格
+        updateTableSpanData(table, col, row, value as number, true);
+    }
+}
+
+/**
+ * 
  * @param soruce 
  * @param target 
  */
 export function syncTableData(source:Array<ISingleRow>, target:Array<ISingleRow>) {
+
     for (let i = 0; i < source.length; i++) {
         let rowCells = source[i].cells;
         for (let j = 0; j < rowCells.length; j++) {
             const {label, rspan, cspan } = rowCells[j] as ICell;
             if (i < target.length && j < target[i].cells.length) {
                 target[i].cells[j].label = label;
-                if (rspan) target[i].cells[j].rspan = rspan;
-                if (cspan) target[i].cells[j].cspan = cspan;
+                target[i].cells[j].rspan = rspan;
+                target[i].cells[j].cspan = cspan;
             }
         }
     }

@@ -8,7 +8,8 @@ import { CreateOptionsRes } from 'dooringx-lib/dist/core/components/formTypes';
 import { IBlockType } from 'dooringx-lib/dist/core/store/storetype';
 import { updateFormBlockData } from '../helper/update';
 import { forkCountArray } from '../helper/utils';
-import { createTableByRowAndCol, ICell, ISingleRow, syncTableData, updateTableSpanData } from '../helper/table';
+import { createTableByRowAndCol, ICell, ISingleRow, syncTableData, IModifyType, updateTableAfterModify } from '../helper/table';
+import type { SpanType } from '../helper/table';
 
 interface MBorderProps {
 	data: CreateOptionsRes<FormMap, 'opTable'>;
@@ -21,44 +22,30 @@ interface TableFieldType {
 	label:string;
 }
 
-interface IModifyType {
-	col:number;
-	row:number;
-	type:string;
-	value:string|number;
-}
-
-function ComSelect({count, onChange}:any) {
-	const ss = forkCountArray(count);
-	return (
-		<Select onChange={onChange}>
-			{
-				ss.map((e,i)=>(
-					<Select.Option value={i}>{i+1}</Select.Option>
-				))
-			}
-		</Select>
-	)
-}
-
 const MBorder = (props: MBorderProps) => {
 	const option = useMemo(() => {
 		return props.data?.option || {};
 	}, [props.data]);
+
+	const curBlock = props.current;
 	
-	const [tblType, setTblType] = useState<string>(props.current.props[(option as any).field[0]]);
-	const [showHeader, setShowHeader] = useState<boolean>(props.current.props[(option as any).field[2]]);
-	const [rowCount, setRowCount] = useState<number>(props.current.props[(option as any).field[3]]);
+	const [tblType, setTblType] = useState<string>(curBlock.props[(option as any).field[0]]);
+	const [showHeader, setShowHeader] = useState<boolean>(curBlock.props[(option as any).field[2]]);
+	const [rowCount, setRowCount] = useState<number>(curBlock.props[(option as any).field[3]]);
 	const [colCount, setColCount] = useState<number>(
-		props.current.props[(option as any).field[2]] ? props.current.props[(option as any).field[1]].length : props.current.props[(option as any).field[4]]
+		curBlock.props[(option as any).field[2]] ? curBlock.props[(option as any).field[1]].length : curBlock.props[(option as any).field[4]]
 	);
 	
 	const [rowNo, setRowNo] = useState<number>(0);
 	const [colNo, setColNo] = useState<number>(0);
 	const [rows, setRows] = useState<Array<ISingleRow>>([]);
 	
-	const [targetKeys, setTargetKeys] = useState<Array<string>>(props.current.props[(option as any).field[1]]);
+	const [targetKeys, setTargetKeys] = useState<Array<string>>(curBlock.props[(option as any).field[1]]);
 	const [selectedKeys, setSelectedKeys] = useState<Array<string>>([]);
+	// 当前选中table cell的默认值
+	const [spanRow, setSpanRow] = useState<number|undefined>();
+	const [spanCol, setSpanCol] = useState<number|undefined>();
+	const [vlabel, setVlabel] = useState<string>();
 	const store = props.config.getStore();
 	const listTable = [
 		{
@@ -91,16 +78,15 @@ const MBorder = (props: MBorderProps) => {
 	]
 	const [datasource, setDatasource] = useState<Array<TableFieldType>>(()=>{
 		let res:Array<TableFieldType> = [];
-		let tmp = listTable.filter(e=>e.value==props.current.props[(option as any).field[0]])
+		let tmp = listTable.filter(e=>e.value==curBlock.props[(option as any).field[0]])
 		if (tmp.length > 0) res = tmp[0].sub as Array<TableFieldType>;
 		return res;
 	});
-
 	const handleChange = (newTargetKeys: string[], direction: TransferDirection, moveKeys: string[]) => {
 		if (direction === 'right') {
 			let tmp = [...targetKeys, ...moveKeys];
 			setTargetKeys(tmp);		
-			let tmp2 = (tmp as Array<string>).map((e:string,i:number)=>({x:i,y:0,label:e} as ICell));
+			let tmp2 = (tmp as Array<string>).map((e:string,i:number)=>({row:i, col:0,label:e} as ICell));
 			updateFormBlockData(store, props, (v) => v.props[(option as any).field[1]] = tmp2);
 		} else if (direction === 'left') {
 			setTargetKeys(newTargetKeys);
@@ -111,29 +97,60 @@ const MBorder = (props: MBorderProps) => {
 		// setSelectedKeys([...targetSelectedKeys, ...sourceSelectedKeys]);
 		setSelectedKeys([...sourceSelectedKeys, ...targetSelectedKeys]);
 	};
-	function updateTableRowData(updateCode:number, target?:IModifyType|number) {
+	// 数据更新 
+	function updateTableRowData(updateCode:number, target:number) {
 		if (updateCode === 0 || updateCode === 1) {
 			setColCount(target as number)
-			let rowData = createTableByRowAndCol(target as number, rowCount);		
+			let rowData = createTableByRowAndCol(target as number, rowCount, curBlock.props[(option as any).field[6]]);		
 			syncTableData(rows, rowData);
 			setRows(rowData);
 			updateFormBlockData(store, props, (v) => v.props[(option as any).field[5]] = rowData);
-		} else if (updateCode === 2) {
-			const {col, row, type, value} = target as IModifyType;
-			if (rows.length > 0 && row !== undefined && col !== undefined) {
-				const rowData = deepCopy(rows);
-				if (type == 'label') rowData[row].cells[col].label = value;
-				else if (type == 'colSpan') {
-					updateTableSpanData(rowData, col, row, value as number, false);
-				} else if (type == 'rowSpan') {
-					updateTableSpanData(rowData, col, row, value as number, true);
-				}
-				setRows(rowData);
-				updateFormBlockData(store, props, (v) => v.props[(option as any).field[5]] = rowData);		
-			}
-		} else if (updateCode === 3) {
-			
 		}
+	}
+	function updateSpanInfo(target:IModifyType) {
+		let arr:Array<IModifyType> = curBlock.props[(option as any).field[6]];
+		let isFind = false;
+		for (let i = 0; i < arr.length; i++) {
+			const {row, col, type } = arr[i];
+			if (row == target.row && col == target.col && type == target.type) {
+				arr[i].value = target.value;
+				isFind = true;
+			}
+		}
+		if (isFind === false) {
+			arr.push(target);
+		}
+		updateFormBlockData(store, props, (v) => v.props[(option as any).field[6]] = arr);
+	}
+	// 更新
+	function updateRowColNumber(isRow:boolean, val:number) {		
+		if (isRow) {
+			setRowNo(val)
+		} else {
+			setColNo(val);
+		}
+		let tbl:Array<ISingleRow> = curBlock.props[(option as any).field[5]];
+		let t2:Array<ICell> = [];
+		tbl.forEach(e=>t2.push(...e.cells));
+		let t3 = t2.filter(e=>e.row === rowNo && e.col === colNo)[0]
+		if (t3) {
+			setVlabel(t3.label);
+			setSpanRow(t3.rspan);
+			setSpanCol(t3.cspan);
+		}
+	}
+	function updateChangeSpan(type:SpanType, v:number|string) {
+		const target:IModifyType = {
+			col: colNo,
+			row: rowNo,
+			type: type,
+			value: v,
+		}
+		const rowData = deepCopy(rows);
+		updateSpanInfo(target as IModifyType);
+		updateTableAfterModify(rowData, target as IModifyType);
+		setRows(rowData);
+		updateFormBlockData(store, props, (v) => v.props[(option as any).field[5]] = rowData);
 	}
 
 	return (
@@ -188,36 +205,30 @@ const MBorder = (props: MBorderProps) => {
 					{(option as any)?.label2 || '修改'}：
 				</Col>
 				<Col span={4} title={'行号'} style={{ lineHeight: '30px' }}>
-					<Select onChange={(v:number)=>setColNo(v)} options={forkCountArray(colCount).map((e, i) => ({
+					<Select onChange={(v:number)=>updateRowColNumber(false,v)} options={forkCountArray(colCount).map((e, i) => ({
 						value: i,
 						label: i+1,
 					}))}></Select>
 				</Col>
 				<Col span={4} title={'列号'} style={{ lineHeight: '30px' }}>
-					<Select onChange={(v:number)=>setRowNo(v)} options={forkCountArray(rowCount).map((e, i) => ({
+					<Select onChange={(v:number)=>updateRowColNumber(true, v)} options={forkCountArray(rowCount).map((e, i) => ({
 						value: i,
 						label: i+1,
 					}))}></Select>
 				</Col>
 				<Col span={10} title={'内容'} style={{ lineHeight: '30px' }}>
-					<Input onChange={(e)=>{
-						updateTableRowData(2, {
-							col: colNo, row: rowNo, type: 'label', value: e.target.value
-						});
-					}}/>
-				</Col>
-				<Col span={7} title={'合并行'} style={{ lineHeight: '30px' }}>
-					<InputNumber min={0} onChange={(e)=>{
-						updateTableRowData(2, {
-							col: colNo, row: rowNo, type: 'colSpan', value: e
-						});
+					<Input value={vlabel} onChange={(e)=>{
+						updateChangeSpan('label', e.target.value);
 					}}/>
 				</Col>
 				<Col span={7} title={'合并列'} style={{ lineHeight: '30px' }}>
-					<InputNumber min={0} onChange={(e)=>{
-						updateTableRowData(2, {
-							col: colNo, row: rowNo, type: 'rowSpan', value: e
-						});
+					<InputNumber min={1} max={colCount} value={spanCol} onChange={(e)=>{
+						updateChangeSpan('colSpan', e);
+					}}/>
+				</Col>
+				<Col span={7} title={'合并行'} style={{ lineHeight: '30px' }}>
+					<InputNumber min={1} max={rowCount} value={spanRow} onChange={(e)=>{
+						updateChangeSpan('rowSpan', e);
 					}}/>
 				</Col>
 			</Row>

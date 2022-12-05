@@ -77,7 +77,7 @@ const RegTable = createComponent({
 			}),
 			createPannelOptions<FormMap, 'opTable'>('opTable', {
 				label: '表格',
-				field:['tableType','tableColumn','tableShowHeader','tableRowCount','tableColCount','tableRow']
+				field:['tableType','tableColumn','tableShowHeader','tableRowCount','tableColCount','tableRow','tableSpanInfo']
 			}),
 		],
 	},
@@ -104,6 +104,7 @@ const RegTable = createComponent({
 			tableColumn: [],
 			tableShowHeader:true,
 			tableRow: [],
+			tableSpanInfo: [],			
 			tableRowCount: 3,
 			tableColCount: 0,
 		},
