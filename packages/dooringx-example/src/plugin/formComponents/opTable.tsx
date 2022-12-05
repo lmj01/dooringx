@@ -36,16 +36,6 @@ const MBorder = (props: MBorderProps) => {
 		curBlock.props[(option as any).field[2]] ? curBlock.props[(option as any).field[1]].length : curBlock.props[(option as any).field[4]]
 	);
 	
-	const [rowNo, setRowNo] = useState<number>(0);
-	const [colNo, setColNo] = useState<number>(0);
-	const [rows, setRows] = useState<Array<ISingleRow>>([]);
-	
-	const [targetKeys, setTargetKeys] = useState<Array<string>>(curBlock.props[(option as any).field[1]]);
-	const [selectedKeys, setSelectedKeys] = useState<Array<string>>([]);
-	// 当前选中table cell的默认值
-	const [spanRow, setSpanRow] = useState<number|undefined>();
-	const [spanCol, setSpanCol] = useState<number|undefined>();
-	const [vlabel, setVlabel] = useState<string>();
 	const store = props.config.getStore();
 	const listTable = [
 		{
@@ -76,17 +66,46 @@ const MBorder = (props: MBorderProps) => {
 			]
 		},
 	]
+	// 后台返回的数据
 	const [datasource, setDatasource] = useState<Array<TableFieldType>>(()=>{
 		let res:Array<TableFieldType> = [];
 		let tmp = listTable.filter(e=>e.value==curBlock.props[(option as any).field[0]])
 		if (tmp.length > 0) res = tmp[0].sub as Array<TableFieldType>;
 		return res;
 	});
+	
+	
+	// table的数据
+	const [rows, setRows] = useState<Array<ISingleRow>>(curBlock.props[(option as any).field[5]]);
+	
+	// 选中的行和列编号
+	const [rowNo, setRowNo] = useState<number|undefined>();
+	const [colNo, setColNo] = useState<number|undefined>();
+	useEffect(() => {
+		// 当前选中有效值后进行更新
+		if (rowNo !== undefined && colNo !== undefined) {
+			let tbl:Array<ISingleRow> = curBlock.props[(option as any).field[5]];
+			let t2:Array<ICell> = [];
+			tbl.forEach(e=>t2.push(...e.cells));
+			let t3 = t2.filter(e=>e.row === rowNo && e.col === colNo)[0]
+			if (t3) {
+				setVlabel(t3.label);
+				setSpanRow(t3.rspan);
+				setSpanCol(t3.cspan);
+			}
+		}
+	}, [rowNo, colNo])
+
+	// 表头数据
+	const [targetKeys, setTargetKeys] = useState<Array<string>>(
+		curBlock.props[(option as any).field[1]].map((e:any)=>e.label) // 转换为key
+	);
+	const [selectedKeys, setSelectedKeys] = useState<Array<string>>([]);
 	const handleChange = (newTargetKeys: string[], direction: TransferDirection, moveKeys: string[]) => {
 		if (direction === 'right') {
 			let tmp = [...targetKeys, ...moveKeys];
-			setTargetKeys(tmp);		
-			let tmp2 = (tmp as Array<string>).map((e:string,i:number)=>({row:i, col:0,label:e} as ICell));
+			setTargetKeys(tmp);
+			let tmp2 = (tmp as Array<string>).map((e:string,i:number)=>({row:0, col:i,label:e}));
 			updateFormBlockData(store, props, (v) => v.props[(option as any).field[1]] = tmp2);
 		} else if (direction === 'left') {
 			setTargetKeys(newTargetKeys);
@@ -97,6 +116,28 @@ const MBorder = (props: MBorderProps) => {
 		// setSelectedKeys([...targetSelectedKeys, ...sourceSelectedKeys]);
 		setSelectedKeys([...sourceSelectedKeys, ...targetSelectedKeys]);
 	};
+	
+	// 扩展行和列的数字
+	const [spanRow, setSpanRow] = useState<number|undefined>();
+	const [spanCol, setSpanCol] = useState<number|undefined>();
+	const [vlabel, setVlabel] = useState<string|string>(''); // 修改值
+	const [vtype, setVtype] = useState<SpanType|undefined>(); // 修改类型
+	useEffect(() => {		
+		if (colNo !== undefined && rowNo !== undefined && vtype !== undefined) {
+			const target:IModifyType = {
+				col: colNo,
+				row: rowNo,
+				type: (vtype as SpanType),
+				value: vlabel,
+			}
+			const rowData = deepCopy(rows);
+			updateSpanInfo(target as IModifyType);
+			updateTableAfterModify(rowData, target as IModifyType);
+			setRows(rowData);
+			updateFormBlockData(store, props, (v) => v.props[(option as any).field[5]] = rowData);
+		}
+	}, [spanRow, spanCol, vlabel])
+	
 	// 数据更新 
 	function updateTableRowData(updateCode:number, target:number) {
 		if (updateCode === 0 || updateCode === 1) {
@@ -122,37 +163,6 @@ const MBorder = (props: MBorderProps) => {
 		}
 		updateFormBlockData(store, props, (v) => v.props[(option as any).field[6]] = arr);
 	}
-	// 更新
-	function updateRowColNumber(isRow:boolean, val:number) {		
-		if (isRow) {
-			setRowNo(val)
-		} else {
-			setColNo(val);
-		}
-		let tbl:Array<ISingleRow> = curBlock.props[(option as any).field[5]];
-		let t2:Array<ICell> = [];
-		tbl.forEach(e=>t2.push(...e.cells));
-		let t3 = t2.filter(e=>e.row === rowNo && e.col === colNo)[0]
-		if (t3) {
-			setVlabel(t3.label);
-			setSpanRow(t3.rspan);
-			setSpanCol(t3.cspan);
-		}
-	}
-	function updateChangeSpan(type:SpanType, v:number|string) {
-		const target:IModifyType = {
-			col: colNo,
-			row: rowNo,
-			type: type,
-			value: v,
-		}
-		const rowData = deepCopy(rows);
-		updateSpanInfo(target as IModifyType);
-		updateTableAfterModify(rowData, target as IModifyType);
-		setRows(rowData);
-		updateFormBlockData(store, props, (v) => v.props[(option as any).field[5]] = rowData);
-	}
-
 	return (
 		<div>
 			<Row style={{ padding: '10px' }}>
@@ -205,31 +215,25 @@ const MBorder = (props: MBorderProps) => {
 					{(option as any)?.label2 || '修改'}：
 				</Col>
 				<Col span={4} title={'行号'} style={{ lineHeight: '30px' }}>
-					<Select onChange={(v:number)=>updateRowColNumber(false,v)} options={forkCountArray(colCount).map((e, i) => ({
+					<Select value={colNo} onSelect={(v) => setColNo(v)} options={forkCountArray(colCount).map((e, i) => ({
 						value: i,
 						label: i+1,
 					}))}></Select>
 				</Col>
 				<Col span={4} title={'列号'} style={{ lineHeight: '30px' }}>
-					<Select onChange={(v:number)=>updateRowColNumber(true, v)} options={forkCountArray(rowCount).map((e, i) => ({
+					<Select value={rowNo} onSelect={(v) => setRowNo(v)} options={forkCountArray(rowCount).map((e, i) => ({
 						value: i,
 						label: i+1,
 					}))}></Select>
 				</Col>
 				<Col span={10} title={'内容'} style={{ lineHeight: '30px' }}>
-					<Input value={vlabel} onChange={(e)=>{
-						updateChangeSpan('label', e.target.value);
-					}}/>
+					<Input value={vlabel} onChange={(e) => {  setVtype('label');setVlabel(e.target.value);}}/>
 				</Col>
 				<Col span={7} title={'合并列'} style={{ lineHeight: '30px' }}>
-					<InputNumber min={1} max={colCount} value={spanCol} onChange={(e)=>{
-						updateChangeSpan('colSpan', e);
-					}}/>
+					<InputNumber min={1} max={colCount} value={spanCol} onChange={(e) => { setVtype('rowSpan');setVlabel(e);setSpanCol(e); }}/>
 				</Col>
 				<Col span={7} title={'合并行'} style={{ lineHeight: '30px' }}>
-					<InputNumber min={1} max={rowCount} value={spanRow} onChange={(e)=>{
-						updateChangeSpan('rowSpan', e);
-					}}/>
+					<InputNumber min={1} max={rowCount} value={spanRow} onChange={(e) => {  setVtype('colSpan');setVlabel(e);setSpanRow(e); }}/>
 				</Col>
 			</Row>
 		</div>
