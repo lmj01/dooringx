@@ -17,9 +17,14 @@ import 'animate.css';
 import { IntlProvider } from 'react-intl';
 import { locale } from 'dooringx-lib';
 import { localeKey } from '../../../dooringx-lib/dist/locale';
+
+// 入口
 export const config = new UserConfig(plugin);
+// 全局上下文
 export const configContext = createContext<UserConfig>(config);
+
 //config.i18n = false;
+
 // 自定义右键
 const contextMenuState = config.getContextMenuState();
 const unmountContextMenu = contextMenuState.unmountContextMenu;

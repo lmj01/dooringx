@@ -4,3 +4,12 @@ dooringx\packages\dooringx-lib\src\core\components\abstract.ts
 
 为什么要scale？
 是方便查看全部情况，是当前元素得transform变换，全部大小按照125%就是正常得范围
+
+如何初始全局数据？
+
+
+## 入口
+src/layouts/index.tsx
+
+
+

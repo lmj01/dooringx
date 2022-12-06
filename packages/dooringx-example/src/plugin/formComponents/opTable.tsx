@@ -9,6 +9,7 @@ import { IBlockType } from 'dooringx-lib/dist/core/store/storetype';
 import { updateFormBlockData } from '../helper/update';
 import { forkCountArray } from '../helper/utils';
 import { createTableByRowAndCol, ICell, ISingleRow, syncTableData, ISpanType, updateTableAfterModify, updateTableCell } from '../helper/table';
+import { getTemplateTableColumnData } from '@/pages/data/template';
 
 interface MBorderProps {
 	data: CreateOptionsRes<FormMap, 'opTable'>;
@@ -30,35 +31,13 @@ const MBorder = (props: MBorderProps) => {
 	
 	const [tblType, setTblType] = useState<string|undefined>(curBlock.props[(option as any).field[0]]);
 	const store = props.config.getStore();
-	const listTable = [
-		{
-			value:'tblRecord', label:'记录表',
-			sub: [
-				{ key:'RECORD-F001', label:'RECORD-field1'},
-				{ key:'RECORD-F002', label:'RECORD-field2'},
-				{ key:'RECORD-F003', label:'RECORD-field3'},
-				{ key:'RECORD-F004', label:'RECORD-field4'},
-				{ key:'RECORD-F005', label:'RECORD-field5'},
-				{ key:'RECORD-F006', label:'RECORD-field6'},
-				{ key:'RECORD-F007', label:'RECORD-field7'},
-			]
-		},
-		{
-			value:'tblReport', label:'报告表',
-			sub: [
-				{ key:'REPORT-F001', label:'REPORT-field1'},
-				{ key:'REPORT-F002', label:'REPORT-field2'},
-				{ key:'REPORT-F003', label:'REPORT-field3'},
-				{ key:'REPORT-F004', label:'REPORT-field4'},
-				{ key:'REPORT-F005', label:'REPORT-field5'},
-				{ key:'REPORT-F006', label:'REPORT-field6'},
-				{ key:'REPORT-F007', label:'REPORT-field7'},
-				{ key:'REPORT-F008', label:'REPORT-field8'},
-				{ key:'REPORT-F009', label:'REPORT-field9'},
-				{ key:'REPORT-F0010', label:'REPORT-field10'},
-			]
-		},
-	]
+	const [tblColumns, setTblColumns] = useState<Array<any>>([]);
+	// 初始化，第一次执行
+	useEffect(() => {
+		getTemplateTableColumnData().then((res) => {
+			setTblColumns(res as Array<any>);
+		})
+	}, []);
 
 	// 后台返回的数据
 	const [datasource, setDatasource] = useState<Array<TableFieldType>>(()=> updateDataSource(curBlock.props[(option as any).field[0]]));
@@ -69,7 +48,7 @@ const MBorder = (props: MBorderProps) => {
 	function updateDataSource(type:string|undefined) {
 		let res:Array<TableFieldType> = [];
 		if (type) {
-			let tmp = listTable.filter(e=>e.value==type)
+			let tmp = tblColumns.filter(e=>e.value==type)
 			if (tmp.length > 0) res = tmp[0].sub as Array<TableFieldType>;
 		}
 		return res;
@@ -266,7 +245,7 @@ const MBorder = (props: MBorderProps) => {
 					<Switch checkedChildren={'显示头'} unCheckedChildren={'关闭头'} checked={showHeader} onChange={e=>setShowHeader(e)} />
 				</Col>
 				<Col span={7} title={'行数'} style={{ lineHeight: '30px' }}>
-					{ showHeader ? <Select value={tblType} disabled={!showHeader} onChange={(e) => setTblType(e)} options={listTable} />
+					{ showHeader ? <Select value={tblType} disabled={!showHeader} onChange={(e) => setTblType(e)} options={tblColumns} />
 						: <InputNumber value={colCount} min={1} onChange={(e)=>setColCount(e)} />
 					}
 				</Col>

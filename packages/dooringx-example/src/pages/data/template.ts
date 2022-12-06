@@ -14,3 +14,52 @@ export function getTemplateForm1() {
         resolve(templateForm1);
     });
 }
+
+const templateTitleData = [
+    { value:'YJ-RECORD-001', label:'YJ-RECORD-001'},
+    { value:'YJ-RECORD-002', label:'YJ-RECORD-002'},
+    { value:'YJ-REPORT-001', label:'YJ-REPORT-001'},
+    { value:'YJ-REPORT-002', label:'YJ-REPORT-002'},
+]
+
+export function getTemplateTitle() {
+    return new Promise((resolve) => {
+        resolve(templateTitleData);
+    });
+}
+
+const templateTableColumnData = [
+    {
+        value:'tblRecord', label:'记录表',
+        sub: [
+            { key:'RECORD-F001', label:'RECORD-field1'},
+            { key:'RECORD-F002', label:'RECORD-field2'},
+            { key:'RECORD-F003', label:'RECORD-field3'},
+            { key:'RECORD-F004', label:'RECORD-field4'},
+            { key:'RECORD-F005', label:'RECORD-field5'},
+            { key:'RECORD-F006', label:'RECORD-field6'},
+            { key:'RECORD-F007', label:'RECORD-field7'},
+        ]
+    },
+    {
+        value:'tblReport', label:'报告表',
+        sub: [
+            { key:'REPORT-F001', label:'REPORT-field1'},
+            { key:'REPORT-F002', label:'REPORT-field2'},
+            { key:'REPORT-F003', label:'REPORT-field3'},
+            { key:'REPORT-F004', label:'REPORT-field4'},
+            { key:'REPORT-F005', label:'REPORT-field5'},
+            { key:'REPORT-F006', label:'REPORT-field6'},
+            { key:'REPORT-F007', label:'REPORT-field7'},
+            { key:'REPORT-F008', label:'REPORT-field8'},
+            { key:'REPORT-F009', label:'REPORT-field9'},
+            { key:'REPORT-F0010', label:'REPORT-field10'},
+        ]
+    },
+]
+
+export function getTemplateTableColumnData() {
+    return new Promise((resolve) => {
+        resolve(templateTableColumnData);
+    });
+}
