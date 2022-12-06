@@ -24,6 +24,7 @@ import { Button, Input, message, Modal, Statistic, Upload } from 'antd';
 import { localeKey } from '../../../dooringx-lib/dist/locale';
 import { LeftRegistComponentMapItem } from 'dooringx-lib/dist/core/crossDrag';
 import { toPng } from '../dom2image';
+import { getTemplateForm1 } from './data/template';
 
 export const HeaderHeight = '40px';
 const footerConfig = function () {
@@ -92,6 +93,15 @@ export default function IndexPage() {
 		aTag.click();
 		URL.revokeObjectURL(url);
 	};
+
+	function handleBtnClick(type:string) {
+		if (type === 'template-form1') {
+			getTemplateForm1().then((res) => {
+				config.getStore().resetToInitData([res]);
+				setOpen(false);	
+			})
+		}
+	}
 
 	return (
 		<div {...innerContainerDragUp(config)}>
@@ -196,6 +206,7 @@ export default function IndexPage() {
 				>
 					<Button icon={<UploadOutlined />}>&nbsp; 点击上传</Button>
 				</Upload>
+				<Button onClick={()=>handleBtnClick('template-form1')}>{'模板-form1'}</Button>
 			</Modal>
 			<Modal visible={open1} onOk={()=>setOpen1(false)} onCancel={()=>setOpen1(false)} title={'preview'} width={600}>
 				<iframe src="/iframe" style={{

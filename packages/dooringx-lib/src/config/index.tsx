@@ -171,7 +171,7 @@ export const defaultStore: IMainStoreData = {
 	},
 	globalState: {
 		containerColor: 'rgba(255,255,255,1)',
-		title: 'Dooringx',
+		title: '表单布局',
 		bodyColor: 'rgba(255,255,255,1)',
 		script: [],
 		customAnimate: [],

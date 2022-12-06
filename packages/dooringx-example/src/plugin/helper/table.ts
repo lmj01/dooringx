@@ -30,7 +30,7 @@ export interface ISpanType extends ICellType {
 	type: SpanType;
 	value:number;
 }
-export type StyleType = 'textAlign' | 'textContent'; 
+export type StyleType = 'textAlign' | 'textContent' | 'visibility'; 
 export interface IStyleType extends ICellType {
     type: StyleType;
     value:string;
@@ -120,9 +120,7 @@ export function updateTableCell(table:Array<ISingleRow>, target: IStyleType) {
         tmp.label = value;
     } else {
         if (tmp.style === undefined) tmp.style = {};
-        if (type === 'textAlign') {
-            tmp.style[type] = value;
-        }
+        tmp.style[type] = value;
     }
 }
 

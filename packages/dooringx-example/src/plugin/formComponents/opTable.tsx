@@ -115,6 +115,10 @@ const MBorder = (props: MBorderProps) => {
 				setTextContent(t3.label);
 				if (t3.style) {
 					if (t3.style['textAlign']) setTextAlign(t3.style['textAlign']);
+					else setTextAlign('');
+					
+					if (t3.style['visibility']) setTextVisibility(t3.style['visibility']);
+					else setTextVisibility('');
 				}
 			}
 		}
@@ -212,6 +216,20 @@ const MBorder = (props: MBorderProps) => {
 		});
 	}, [textAlign]);
 
+	const TextVisibility = [
+		{ value:'visible', label:'可见'},
+		{ value:'hidden', label:'隐藏'},
+	]
+	const [textVisibility, setTextVisibility] = useState<string>('');
+	useEffect(() => {
+		updateTableData((e:Array<ISingleRow>) => {
+			updateTableCell(e, {
+				row: rowNo as number, col: colNo as number, type: 'visibility', value: textVisibility,
+			})
+		});
+	}, [textVisibility]);
+	
+
 	function updateTableData(cb:(e:Array<ISingleRow>)=>void) {
 		const rowData = deepCopy(rows);
 		cb(rowData);
@@ -286,8 +304,12 @@ const MBorder = (props: MBorderProps) => {
 			</Row>
 			<Row>
 				<Col span={4}>{'字体对齐'}</Col>
-				<Col span={10}>
+				<Col span={8}>
 					<Select value={textAlign} onChange={(e) => setTextAlign(e)} options={TextAlignOption} />
+				</Col>
+				<Col span={4}>{'文字隐藏'}</Col>
+				<Col span={8}>
+					<Select value={textVisibility} onChange={(e) => setTextVisibility(e)} options={TextVisibility} />
 				</Col>
 			</Row>
 		</div>
