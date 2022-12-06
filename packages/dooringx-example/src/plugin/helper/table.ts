@@ -92,7 +92,7 @@ export function updateTableSpanData(table:Array<ISingleRow>, col:number, row:num
             // 增加
         }
     } 
-    console.log('-update span-', col,row,span,table)
+    // console.log('-update span-', col,row,span,table)
 }
 
 /**
@@ -133,11 +133,13 @@ export function syncTableData(source:Array<ISingleRow>, target:Array<ISingleRow>
     for (let i = 0; i < source.length; i++) {
         let rowCells = source[i].cells;
         for (let j = 0; j < rowCells.length; j++) {
-            const {label, rspan, cspan } = rowCells[j] as ICell;
+            const { label, rspan, cspan, style, children } = rowCells[j] as ICell;
             if (i < target.length && j < target[i].cells.length) {
                 target[i].cells[j].label = label;
                 target[i].cells[j].rspan = rspan;
                 target[i].cells[j].cspan = cspan;
+                target[i].cells[j].style = style;
+                if (children) target[i].cells[j].children = children;
             }
         }
     }

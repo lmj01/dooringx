@@ -1,5 +1,5 @@
 
-import { useMemo, memo, useState, useEffect } from 'react';
+import { useMemo, memo, useState, useEffect, useRef } from 'react';
 import { Row, Col, Transfer, Select, Switch, InputNumber, Input } from 'antd';
 import type { TransferDirection } from 'antd/es/transfer';
 import { UserConfig, deepCopy } from 'dooringx-lib';
@@ -89,15 +89,23 @@ const MBorder = (props: MBorderProps) => {
 		updateFormBlockData(store, props, (v) => v.props[(option as any).field[3]] = rowCount);
 		// 存储tableColCount
 		updateFormBlockData(store, props, (v) => v.props[(option as any).field[4]] = colCount);
-		let rowData = createTableByRowAndCol(colCount, rowCount, curBlock.props[(option as any).field[6]]);		
-		syncTableData(rows, rowData);
-		updateFormBlockData(store, props, (v) => v.props[(option as any).field[5]] = rowData);		
-		setRows(rowData);
+		recreateTableData(colCount, rowCount, rows);
 	}, [rowCount, colCount])
+
+	// 再次选中时重构表格
+	function recreateTableData(c:number, r:number, table:Array<ISingleRow>) {
+		let newTable = createTableByRowAndCol(c, r, curBlock.props[(option as any).field[6]]);		
+		syncTableData(table, newTable);
+		updateFormBlockData(store, props, (v) => v.props[(option as any).field[5]] = newTable);
+		setRows(newTable);
+	}
 		
 	// table的数据
 	const [rows, setRows] = useState<Array<ISingleRow>>(curBlock.props[(option as any).field[5]]);
 	
+	// 变数据
+	const refSpanRow = useRef<number|undefined>();
+	const refSpanCol = useRef<number|undefined>();
 	// 选中的行和列编号
 	const [rowNo, setRowNo] = useState<number|undefined>();
 	const [colNo, setColNo] = useState<number|undefined>();
@@ -113,8 +121,8 @@ const MBorder = (props: MBorderProps) => {
 			tbl.forEach(e=>t2.push(...e.cells));
 			let t3 = t2.filter(e=>e.row === rowNo && e.col === colNo)[0]
 			if (t3) {
-				setSpanRow(t3.rspan);
-				setSpanCol(t3.cspan);
+				refSpanCol.current = t3.cspan;
+				refSpanRow.current = t3.rspan;
 				setTextContent(t3.label);
 				if (t3.style) {
 					if (t3.style['textAlign']) setTextAlign(t3.style['textAlign']);					
@@ -123,6 +131,7 @@ const MBorder = (props: MBorderProps) => {
 			}
 		}
 	}, [rowNo, colNo])
+	const validRowCol = () => rowNo !== undefined && colNo !== undefined;
 
 	// 表头数据
 	const [targetKeys, setTargetKeys] = useState<Array<string>>(
@@ -138,7 +147,7 @@ const MBorder = (props: MBorderProps) => {
 		} else if (direction === 'left') {
 			setTargetKeys(newTargetKeys);
 		}
-		updateTableRowData(0, newTargetKeys.length)
+		setColCount(newTargetKeys.length);
 	}
 	const handleSelectChange = (sourceSelectedKeys: string[], targetSelectedKeys: string[]) => {
 		// setSelectedKeys([...targetSelectedKeys, ...sourceSelectedKeys]);
@@ -146,33 +155,29 @@ const MBorder = (props: MBorderProps) => {
 	};
 	
 	// 扩展行和列的数字
-	const [spanRow, setSpanRow] = useState<number|undefined>();
-	useEffect(() => {		
-		const target:ISpanType = { col: colNo as number, row: rowNo as number, type: 'rowSpan', value: spanRow as number };
-		updateTableData((e:Array<ISingleRow>)=>{
-			updateSpanInfo(target);
-			updateTableAfterModify(e, target);
-		})
+	const [spanRow, setSpanRow] = useState<number>(0);
+	useEffect(() => {
+		if (validRowCol() && spanRow > 1) {
+			refSpanRow.current = spanRow;		
+			const target:ISpanType = { col: colNo as number, row: rowNo as number, type: 'rowSpan', value: spanRow };
+			updateTableData((e:Array<ISingleRow>)=>{
+				updateSpanInfo(target);
+				updateTableAfterModify(e, target);
+			})
+		}
 	}, [spanRow])
-	const [spanCol, setSpanCol] = useState<number|undefined>();
+	const [spanCol, setSpanCol] = useState<number>(0);
 	useEffect(() => {		
-		const target:ISpanType = { col: colNo as number, row: rowNo as number, type: 'colSpan', value: spanCol as number };
-		updateTableData((e:Array<ISingleRow>)=>{
-			updateSpanInfo(target);
-			updateTableAfterModify(e, target);
-		})
+		if (validRowCol() && spanCol > 1) {
+			refSpanCol.current = spanCol;
+			const target:ISpanType = { col: colNo as number, row: rowNo as number, type: 'colSpan', value: spanCol };
+			updateTableData((e:Array<ISingleRow>)=>{
+				updateSpanInfo(target);
+				updateTableAfterModify(e, target);
+			})
+		}
 	}, [spanCol])
 	
-	// 数据更新 
-	function updateTableRowData(updateCode:number, target:number) {
-		if (updateCode === 0 || updateCode === 1) {
-			setColCount(target as number)
-			let rowData = createTableByRowAndCol(target as number, rowCount, curBlock.props[(option as any).field[6]]);		
-			syncTableData(rows, rowData);
-			setRows(rowData);
-			updateFormBlockData(store, props, (v) => v.props[(option as any).field[5]] = rowData);
-		}
-	}
 	function updateSpanInfo(target:ISpanType) {
 		let arr:Array<ISpanType> = curBlock.props[(option as any).field[6]];
 		let isFind = false;
@@ -192,9 +197,11 @@ const MBorder = (props: MBorderProps) => {
 	// 数据
 	const [textContent, setTextContent] = useState<string>(''); // 修改值
 	useEffect(() => {
-		updateTableData((e:Array<ISingleRow>) => {
-			updateTableCell(e, { row: rowNo as number, col: colNo as number, type: 'textContent', value: textContent });
-		});
+		if (textContent.length > 0 && validRowCol()) {
+			updateTableData((e:Array<ISingleRow>) => {
+				updateTableCell(e, { row: rowNo as number, col: colNo as number, type: 'textContent', value: textContent });
+			});
+		}
 	}, [textContent]);
 
 	const TextAlignOption = [
@@ -204,9 +211,11 @@ const MBorder = (props: MBorderProps) => {
 	]
 	const [textAlign, setTextAlign] = useState<string>(''); // 对齐
 	useEffect(() => {
-		updateTableData((e:Array<ISingleRow>) => {
-			updateTableCell(e, { row: rowNo as number, col: colNo as number, type: 'textAlign', value: textAlign });
-		});
+		if (textAlign.length > 0 && validRowCol()) {
+			updateTableData((e:Array<ISingleRow>) => {
+				updateTableCell(e, { row: rowNo as number, col: colNo as number, type: 'textAlign', value: textAlign });
+			});
+		}
 	}, [textAlign]);
 
 	const TextVisibility = [
@@ -215,33 +224,36 @@ const MBorder = (props: MBorderProps) => {
 	]
 	const [textVisibility, setTextVisibility] = useState<string>('');
 	useEffect(() => {
-		updateTableData((e:Array<ISingleRow>) => {
-			updateTableCell(e, { row: rowNo as number, col: colNo as number, type: 'visibility', value: textVisibility });
-		});
+		if (textVisibility.length > 0 && validRowCol()) {
+			updateTableData((e:Array<ISingleRow>) => {
+				updateTableCell(e, { row: rowNo as number, col: colNo as number, type: 'visibility', value: textVisibility });
+			});
+		}
 	}, [textVisibility]);
 	
 	const [cellWidth, setCellWidth] = useState<number|undefined>();
 	useEffect(() => {
-		cellWidth && updateTableData((e:Array<ISingleRow>) => {
-			updateTableCell(e, { row: rowNo as number, col: colNo as number, type: 'width', value: `${cellWidth}px` });
-		});
+		if (cellWidth !== undefined && validRowCol()) {
+			updateTableData((e:Array<ISingleRow>) => {
+				updateTableCell(e, { row: rowNo as number, col: colNo as number, type: 'width', value: `${cellWidth}px` });
+			});
+		}
 	}, [cellWidth]);
 	const [cellHeight, setCellHeight] = useState<number|undefined>();
 	useEffect(() => {
-		cellHeight && updateTableData((e:Array<ISingleRow>) => {
-			updateTableCell(e, { row: rowNo as number, col: colNo as number, type: 'height', value: `${cellHeight}px` });
-		});
+		if (cellHeight !== undefined && validRowCol() ) {
+			updateTableData((e:Array<ISingleRow>) => {
+				updateTableCell(e, { row: rowNo as number, col: colNo as number, type: 'height', value: `${cellHeight}px` });
+			});
+		}
 	}, [cellHeight]);
 	
 
 	function updateTableData(cb:(e:Array<ISingleRow>)=>void) {
-		// 行和列必须选中情况下才起作用
-		if (rowNo !== undefined && colNo !== undefined) {
-			const rowData = deepCopy(rows);
-			cb(rowData);
-			setRows(rowData);
-			updateFormBlockData(store, props, (v) => v.props[(option as any).field[5]] = rowData);
-		}
+		const rowData = deepCopy(rows);
+		cb(rowData);
+		setRows(rowData);
+		updateFormBlockData(store, props, (v) => v.props[(option as any).field[5]] = rowData);
 	}
 
 	return (
@@ -302,11 +314,11 @@ const MBorder = (props: MBorderProps) => {
 			<Row>
 				<Col span={4}>{'合并列'}</Col>
 				<Col span={8}>
-					<InputNumber min={1} max={colCount} value={spanCol} onChange={(e) => setSpanCol(e)}/>
+					<InputNumber min={1} max={colCount} value={refSpanCol.current} onChange={(e) => setSpanCol(e)}/>
 				</Col>
 				<Col span={4}>{'合并行'}</Col>
 				<Col span={8}>
-					<InputNumber min={1} max={rowCount} value={spanRow} onChange={(e) => setSpanRow(e)}/>
+					<InputNumber min={1} max={rowCount} value={refSpanRow.current} onChange={(e) => setSpanRow(e)}/>
 				</Col>
 			</Row>
 			<Row>

@@ -24,7 +24,7 @@ import { Button, Input, message, Modal, Statistic, Upload } from 'antd';
 import { localeKey } from '../../../dooringx-lib/dist/locale';
 import { LeftRegistComponentMapItem } from 'dooringx-lib/dist/core/crossDrag';
 import { toPng } from '../dom2image';
-import { getTemplateForm1 } from './data/template';
+import { getTemplateForm1, getTemplateEmpty } from './data/template';
 
 export const HeaderHeight = '40px';
 const footerConfig = function () {
@@ -95,7 +95,12 @@ export default function IndexPage() {
 	};
 
 	function handleBtnClick(type:string) {
-		if (type === 'template-form1') {
+		if (type === 'template-empty') {
+			getTemplateEmpty().then((res) => {
+				config.getStore().resetToInitData([res]);
+				setOpen(false);	
+			})
+		} else if (type === 'template-form1') {
 			getTemplateForm1().then((res) => {
 				config.getStore().resetToInitData([res]);
 				setOpen(false);	
@@ -107,12 +112,9 @@ export default function IndexPage() {
 		<div {...innerContainerDragUp(config)}>
 			<div style={{ display:'flex', height: HeaderHeight }}>
 				<div style={{}}>
-					<Button onClick={() => saveAsPngFile()}>
-						截图
-					</Button>
-					<Button onClick={() => setOpen1(true)}>
-						预览
-					</Button>
+					<Button onClick={() => handleBtnClick('template-empty')}>新建</Button>
+					<Button onClick={() => saveAsPngFile()}>截图</Button>
+					<Button onClick={() => setOpen1(true)}>预览</Button>
 					{/* <Button
 						onClick={() => {
 							window.open('/iframe');
@@ -152,16 +154,8 @@ export default function IndexPage() {
 					>
 						远程组件
 					</Button> */}
-					<Button onClick={() => createAndDownloadFile('form1.json')}>
-						保存模板
-					</Button>
-					<Button
-						onClick={() => {
-							setOpen(true);
-						}}
-					>
-						打开模板
-					</Button>
+					<Button onClick={() => createAndDownloadFile('form1.json')}>保存模板</Button>
+					<Button onClick={() => setOpen(true)}>打开模板</Button>
 				</div>
 				<div style={{display:'flex', flex:'auto', justifyContent:'flex-end'}}>
 					<Button type="primary" icon={<MinusOutlined />} onClick={()=>{
