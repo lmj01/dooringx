@@ -4,9 +4,8 @@ export interface ICell {
     label: string;
     cspan: number; // default 1
     rspan: number; // default 1
-    width?: number;
-    height?: number;
     style: {[key:string]:any};
+    children?: Array<any>;
 }
 
 export interface ITableColumn {
@@ -30,7 +29,7 @@ export interface ISpanType extends ICellType {
 	type: SpanType;
 	value:number;
 }
-export type StyleType = 'textAlign' | 'textContent' | 'visibility'; 
+export type StyleType = 'textAlign' | 'textContent' | 'visibility'| 'width'| 'height'; 
 export interface IStyleType extends ICellType {
     type: StyleType;
     value:string;
@@ -114,7 +113,7 @@ export function updateTableAfterModify(table:Array<ISingleRow>, target:ISpanType
 
 export function updateTableCell(table:Array<ISingleRow>, target: IStyleType) {
     const {col, row, type, value} = target;
-    if (value.length < 1) return;
+    if (row === undefined || col === undefined || value.length < 1) return;
     const tmp = table[row].cells[col];
     if (type === 'textContent') {
         tmp.label = value;

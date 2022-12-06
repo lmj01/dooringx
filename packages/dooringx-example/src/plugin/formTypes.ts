@@ -26,8 +26,9 @@ export interface BaseType {
 }
 export interface ElementPositionType extends BaseType {
 }
-
 export interface ElementSizeType extends BaseType {
+}
+export interface ElementPaddingType extends BaseType {
 }
 export interface ElementBorderType extends BaseType {
 	width?: number;
@@ -55,6 +56,7 @@ export interface FormMap {
 	switch: FormSwitchType;
 	elPosition: ElementPositionType;
 	elSize: ElementSizeType;
+	elPadding: ElementPaddingType;
 	elBorder: ElementBorderType;
 	font: FontType;
 	opTitle: OpTitleType;

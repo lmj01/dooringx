@@ -8,8 +8,7 @@ import { CreateOptionsRes } from 'dooringx-lib/dist/core/components/formTypes';
 import { IBlockType } from 'dooringx-lib/dist/core/store/storetype';
 import { updateFormBlockData } from '../helper/update';
 import { forkCountArray } from '../helper/utils';
-import { createTableByRowAndCol, ICell, ISingleRow, syncTableData, ISpanType, updateTableAfterModify, updateTableCell, IStyleType } from '../helper/table';
-import type { SpanType } from '../helper/table';
+import { createTableByRowAndCol, ICell, ISingleRow, syncTableData, ISpanType, updateTableAfterModify, updateTableCell } from '../helper/table';
 
 interface MBorderProps {
 	data: CreateOptionsRes<FormMap, 'opTable'>;
@@ -103,6 +102,10 @@ const MBorder = (props: MBorderProps) => {
 	const [rowNo, setRowNo] = useState<number|undefined>();
 	const [colNo, setColNo] = useState<number|undefined>();
 	useEffect(() => {
+		setTextAlign('');
+		setTextVisibility('');
+		setCellWidth(undefined);
+		setCellHeight(undefined);
 		// 当前选中有效值后进行更新
 		if (rowNo !== undefined && colNo !== undefined) {
 			let tbl:Array<ISingleRow> = curBlock.props[(option as any).field[5]];
@@ -114,11 +117,8 @@ const MBorder = (props: MBorderProps) => {
 				setSpanCol(t3.cspan);
 				setTextContent(t3.label);
 				if (t3.style) {
-					if (t3.style['textAlign']) setTextAlign(t3.style['textAlign']);
-					else setTextAlign('');
-					
+					if (t3.style['textAlign']) setTextAlign(t3.style['textAlign']);					
 					if (t3.style['visibility']) setTextVisibility(t3.style['visibility']);
-					else setTextVisibility('');
 				}
 			}
 		}
@@ -147,24 +147,21 @@ const MBorder = (props: MBorderProps) => {
 	
 	// 扩展行和列的数字
 	const [spanRow, setSpanRow] = useState<number|undefined>();
-	const [spanCol, setSpanCol] = useState<number|undefined>();
-	const [vtype, setVtype] = useState<SpanType>(); // 修改类型
 	useEffect(() => {		
-		if (colNo !== undefined && rowNo !== undefined && vtype !== undefined) {
-			const target:ISpanType = {
-				col: colNo,
-				row: rowNo,
-				type: vtype,
-				value: vtype == 'colSpan' ? spanCol as number : spanRow as number,
-			}
-			updateTableData((e:Array<ISingleRow>)=>{
-				if (vtype === 'colSpan' || vtype === 'rowSpan') {
-					updateSpanInfo(target);
-				}
-				updateTableAfterModify(e, target);
-			})
-		}
-	}, [spanRow, spanCol])
+		const target:ISpanType = { col: colNo as number, row: rowNo as number, type: 'rowSpan', value: spanRow as number };
+		updateTableData((e:Array<ISingleRow>)=>{
+			updateSpanInfo(target);
+			updateTableAfterModify(e, target);
+		})
+	}, [spanRow])
+	const [spanCol, setSpanCol] = useState<number|undefined>();
+	useEffect(() => {		
+		const target:ISpanType = { col: colNo as number, row: rowNo as number, type: 'colSpan', value: spanCol as number };
+		updateTableData((e:Array<ISingleRow>)=>{
+			updateSpanInfo(target);
+			updateTableAfterModify(e, target);
+		})
+	}, [spanCol])
 	
 	// 数据更新 
 	function updateTableRowData(updateCode:number, target:number) {
@@ -196,9 +193,7 @@ const MBorder = (props: MBorderProps) => {
 	const [textContent, setTextContent] = useState<string>(''); // 修改值
 	useEffect(() => {
 		updateTableData((e:Array<ISingleRow>) => {
-			updateTableCell(e, {
-				row: rowNo as number, col: colNo as number, type: 'textContent', value: textContent,
-			});
+			updateTableCell(e, { row: rowNo as number, col: colNo as number, type: 'textContent', value: textContent });
 		});
 	}, [textContent]);
 
@@ -210,9 +205,7 @@ const MBorder = (props: MBorderProps) => {
 	const [textAlign, setTextAlign] = useState<string>(''); // 对齐
 	useEffect(() => {
 		updateTableData((e:Array<ISingleRow>) => {
-			updateTableCell(e, {
-				row: rowNo as number, col: colNo as number, type: 'textAlign', value: textAlign,
-			})
+			updateTableCell(e, { row: rowNo as number, col: colNo as number, type: 'textAlign', value: textAlign });
 		});
 	}, [textAlign]);
 
@@ -223,18 +216,32 @@ const MBorder = (props: MBorderProps) => {
 	const [textVisibility, setTextVisibility] = useState<string>('');
 	useEffect(() => {
 		updateTableData((e:Array<ISingleRow>) => {
-			updateTableCell(e, {
-				row: rowNo as number, col: colNo as number, type: 'visibility', value: textVisibility,
-			})
+			updateTableCell(e, { row: rowNo as number, col: colNo as number, type: 'visibility', value: textVisibility });
 		});
 	}, [textVisibility]);
 	
+	const [cellWidth, setCellWidth] = useState<number|undefined>();
+	useEffect(() => {
+		cellWidth && updateTableData((e:Array<ISingleRow>) => {
+			updateTableCell(e, { row: rowNo as number, col: colNo as number, type: 'width', value: `${cellWidth}px` });
+		});
+	}, [cellWidth]);
+	const [cellHeight, setCellHeight] = useState<number|undefined>();
+	useEffect(() => {
+		cellHeight && updateTableData((e:Array<ISingleRow>) => {
+			updateTableCell(e, { row: rowNo as number, col: colNo as number, type: 'height', value: `${cellHeight}px` });
+		});
+	}, [cellHeight]);
+	
 
 	function updateTableData(cb:(e:Array<ISingleRow>)=>void) {
-		const rowData = deepCopy(rows);
-		cb(rowData);
-		setRows(rowData);
-		updateFormBlockData(store, props, (v) => v.props[(option as any).field[5]] = rowData);
+		// 行和列必须选中情况下才起作用
+		if (rowNo !== undefined && colNo !== undefined) {
+			const rowData = deepCopy(rows);
+			cb(rowData);
+			setRows(rowData);
+			updateFormBlockData(store, props, (v) => v.props[(option as any).field[5]] = rowData);
+		}
 	}
 
 	return (
@@ -294,12 +301,12 @@ const MBorder = (props: MBorderProps) => {
 			</Row>
 			<Row>
 				<Col span={4}>{'合并列'}</Col>
-				<Col span={7}>
-					<InputNumber min={1} max={colCount} value={spanCol} onChange={(e) => { setVtype('rowSpan');setVlabel(e);setSpanCol(e); }}/>
+				<Col span={8}>
+					<InputNumber min={1} max={colCount} value={spanCol} onChange={(e) => setSpanCol(e)}/>
 				</Col>
 				<Col span={4}>{'合并行'}</Col>
-				<Col span={7}>
-					<InputNumber min={1} max={rowCount} value={spanRow} onChange={(e) => {  setVtype('colSpan');setVlabel(e);setSpanRow(e); }}/>
+				<Col span={8}>
+					<InputNumber min={1} max={rowCount} value={spanRow} onChange={(e) => setSpanRow(e)}/>
 				</Col>
 			</Row>
 			<Row>
@@ -310,6 +317,16 @@ const MBorder = (props: MBorderProps) => {
 				<Col span={4}>{'文字隐藏'}</Col>
 				<Col span={8}>
 					<Select value={textVisibility} onChange={(e) => setTextVisibility(e)} options={TextVisibility} />
+				</Col>
+			</Row>
+			<Row>
+				<Col span={4}>{'宽度'}</Col>
+				<Col span={8}>
+					<InputNumber min={1} value={cellWidth} onChange={(e) => setCellWidth(e)}/>
+				</Col>
+				<Col span={4}>{'高度'}</Col>
+				<Col span={8}>
+				<InputNumber min={1} value={cellHeight} onChange={(e) => setCellHeight(e)}/>
 				</Col>
 			</Row>
 		</div>

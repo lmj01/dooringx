@@ -32,7 +32,7 @@ function TableSingleRow({cells}:ISingleRow) {
 	return (
 		<tr>
 			{cells.map((row, index)=>{
-				return <td colSpan={row.cspan} rowSpan={row.rspan} key={index} style={row.style}>{row.label}</td>
+				return <td colSpan={row.cspan} rowSpan={row.rspan} key={index} style={row.style}><div className={'mj-cell'}>{row.label}</div></td>
 			})}
 		</tr>
 	)
@@ -85,6 +85,8 @@ const RegTable = createComponent({
 			backgroundColor: 'rgba(0,132,255,1)',
 			lineHeight: 1,
 			borderRadius: 0,
+			paddingX: 5,
+			paddingY: 5,
 			borderData: {
 				borderWidth: 0,
 				borderColor: 'rgba(0,0,0,1)',
