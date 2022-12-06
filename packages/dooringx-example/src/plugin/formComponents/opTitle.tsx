@@ -19,41 +19,18 @@ const MBorder = (props: MBorderProps) => {
 	}, [props.data]);
 	const store = props.config.getStore();
 	const listTitle = [
-		{
-			value:'记录编号', label:'记录编号',
-			sub: [
-				{ value:'YJ-RECORD-001', label:'YJ-RECORD-001'},
-				{ value:'YJ-RECORD-002', label:'YJ-RECORD-002'},
-			]
-		},
-		{
-			value:'报告编号', label:'报告编号',
-			sub: [
-				{ value:'YJ-REPORT-001', label:'YJ-REPORT-001'},
-				{ value:'YJ-REPORT-002', label:'YJ-REPORT-002'},
-			]
-		},
+		{ value:'YJ-RECORD-001', label:'YJ-RECORD-001'},
+		{ value:'YJ-RECORD-002', label:'YJ-RECORD-002'},
+		{ value:'YJ-REPORT-001', label:'YJ-REPORT-001'},
+		{ value:'YJ-REPORT-002', label:'YJ-REPORT-002'},
 	]
-	const [sub, setSub] = useState(()=>{
-		let tmp = listTitle.filter(e=>e.value==props.current.props[(option as any).field[0]])
-		if (tmp.length > 0) return tmp[0].sub;
-	});
 	return (
 		<Row style={{ padding: '10px' }}>
-			<Col span={6} style={{ lineHeight: '30px' }}>
-				{(option as any)?.label || '样式'}：
-			</Col>
-			<Col span={9} style={{ lineHeight: '30px' }}>
+			<Col span={6} className={'mj-line-height'}>编号：</Col>
+			<Col span={9} className={'mj-line-height'}>
 				<Select defaultValue={props.current.props[(option as any).field[0]]} onChange={(val, opt:any) => {
-					setSub(opt.sub)
 					updateFormBlockData(store, props, (v) => v.props[(option as any).field[0]] = val);
-					updateFormBlockData(store, props, (v) => v.props[(option as any).field[1]] = '');
 				}} options={listTitle} />
-			</Col>
-			<Col span={9} style={{ lineHeight: '20px', margin:'auto' }}>
-				<Select defaultValue={props.current.props[(option as any).field[1]]} onChange={(val, opt:any) => {
-					updateFormBlockData(store, props, (v) => v.props[(option as any).field[1]] = val);
-				}} options={sub} />
 			</Col>
 		</Row>
 	);

@@ -63,11 +63,11 @@ const LeftRegistMap: LeftRegistComponentMapItem[] = [
 	},
 	{
 		type: 'basic',
-		component: 'title1',
+		component: 'title',
 		img: 'icon-anniu',
 		imgCustom: <FieldNumberOutlined />,
 		displayName: '编号',
-		urlFn: () => import('./registComponents/title1'),
+		urlFn: () => import('./registComponents/title'),
 	},
 ];
 
