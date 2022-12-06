@@ -206,7 +206,7 @@ export default function IndexPage() {
 				>
 					<Button icon={<UploadOutlined />}>&nbsp; 点击上传</Button>
 				</Upload>
-				<Button onClick={()=>handleBtnClick('template-form1')}>{'模板-form1'}</Button>
+				<Button onClick={()=>handleBtnClick('template-form1')}>{'模板-定制式无托槽矫治器成品检验报告'}</Button>
 			</Modal>
 			<Modal visible={open1} onOk={()=>setOpen1(false)} onCancel={()=>setOpen1(false)} title={'preview'} width={600}>
 				<iframe src="/iframe" style={{
