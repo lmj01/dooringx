@@ -74,6 +74,7 @@ export function createTableByRowAndCol(col:number, row:number, spanInfo:Array<IS
  * @param isRow 
  */
 export function updateTableSpanData(table:Array<ISingleRow>, col:number, row:number, span:number, isRow:boolean) {
+    // console.log('-update span before -', col,row,span,table, isRow)
     if (isRow) {
         if (span > 1) {
             // 删除
@@ -85,15 +86,16 @@ export function updateTableSpanData(table:Array<ISingleRow>, col:number, row:num
     } else {
         if (span > 1) {
             // 删除
+            let oSpan = table[row].cells[col].rspan;
             table[row].cells[col].rspan = span;
-            for (let i = 1; i < span; i++) {
-                table[row+1].cells.splice(col, 1);
+            for (let i = oSpan; i < span; i++) {
+                table[row+i].cells.splice(col, 1);
             }
         } else {
             // 增加
         }
     } 
-    // console.log('-update span-', col,row,span,table)
+    // console.log('-update span after -', table)
 }
 
 /**
