@@ -85,6 +85,7 @@ const MBorder = (props: MBorderProps) => {
 	// 变数据
 	const refSpanRow = useRef<number|undefined>();
 	const refSpanCol = useRef<number|undefined>();
+	const refMultiLine = useRef<boolean>(false);
 	// 选中的行和列编号
 	const [rowNo, setRowNo] = useState<number|undefined>();
 	const [colNo, setColNo] = useState<number|undefined>();
@@ -102,6 +103,7 @@ const MBorder = (props: MBorderProps) => {
 			if (t3) {
 				refSpanCol.current = t3.cspan;
 				refSpanRow.current = t3.rspan;
+				refMultiLine.current = t3.type === 'textarea';
 				setTextContent(t3.label);
 				if (t3.style) {
 					if (t3.style['textAlign']) setTextAlign(t3.style['textAlign']);					
@@ -174,6 +176,16 @@ const MBorder = (props: MBorderProps) => {
 	}
 
 	// 数据
+	const [multiLine, setMultiLine] = useState<boolean>(false); // 修改值
+	useEffect(() => {
+		console.log('-23-', refMultiLine.current, multiLine)
+		if (validRowCol()) {
+			updateTableData((e:Array<ISingleRow>) => {
+				updateTableCell(e, { row: rowNo as number, col: colNo as number, type: 'multiLine', value: multiLine.toString() });
+			});
+		}
+	}, [multiLine]);
+
 	const [textContent, setTextContent] = useState<string>(''); // 修改值
 	useEffect(() => {
 		if (textContent.length > 0 && validRowCol()) {
@@ -182,7 +194,7 @@ const MBorder = (props: MBorderProps) => {
 			});
 		}
 	}, [textContent]);
-
+	
 	const TextAlignOption = [
 		{ value:'left', label:'左对齐'},
 		{ value:'center', label:'居中'},
@@ -283,11 +295,14 @@ const MBorder = (props: MBorderProps) => {
 						label: i+1,
 					}))}></Select>
 				</Col>
+				<Col span={8} className={'mj-line-height'}>
+					<Switch checkedChildren={'单行'} unCheckedChildren={'多行'} checked={refMultiLine.current} onChange={e=>{refMultiLine.current=e; setMultiLine(e);}} />
+				</Col>
 			</Row>
 			<Row>
-				<Col span={2}>{'内容'}</Col>
-				<Col span={22}>
-					<Input.TextArea value={textContent} onChange={(e) => setTextContent(e.target.value)} />
+				<Col span={4}>{'内容'}</Col>
+				<Col span={20}>
+					<Input.TextArea rows={4} value={textContent} onChange={(e) => setTextContent(e.target.value)} />
 				</Col>
 			</Row>
 			<Row>
@@ -317,7 +332,7 @@ const MBorder = (props: MBorderProps) => {
 				</Col>
 				<Col span={4}>{'高度'}</Col>
 				<Col span={8}>
-				<InputNumber min={1} value={cellHeight} onChange={(e) => setCellHeight(e)}/>
+					<InputNumber min={1} value={cellHeight} onChange={(e) => setCellHeight(e)}/>
 				</Col>
 			</Row>
 		</div>

@@ -1,7 +1,7 @@
 import { createComponent, createPannelOptions } from 'dooringx-lib';
 import { FormMap } from '../formTypes';
 import { ComponentRenderConfigProps } from 'dooringx-lib/dist/core/components/componentItem';
-import { IGridRow, ISingleRow, ITableColumn } from '../helper/table';
+import { IGridRow, ISingleRow, ITableColumn, ICell } from '../helper/table';
 
 function TableColumn({columns, showHeader}:ITableColumn) {
 	if (showHeader) {
@@ -28,11 +28,17 @@ function TableFooter({footers}:{footers:Array<string>}) {
 		</footer>
 	)
 }
+function TableCell({cell}:{cell:ICell}) {
+	if (cell.type === 'textarea') {
+		return <td colSpan={cell.cspan} rowSpan={cell.rspan} style={cell.style}><div className={'mj-cell'}><textarea value={cell.label}></textarea></div></td>	
+	}
+	return <td colSpan={cell.cspan} rowSpan={cell.rspan} style={cell.style}><div className={'mj-cell'}>{cell.label}</div></td>
+}
 function TableSingleRow({cells}:ISingleRow) {
 	return (
 		<tr>
 			{cells.map((row, index)=>{
-				return <td colSpan={row.cspan} rowSpan={row.rspan} key={index} style={row.style}><div className={'mj-cell'}>{row.label}</div></td>
+				return <TableCell cell={row} key={index} />
 			})}
 		</tr>
 	)

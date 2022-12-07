@@ -6,6 +6,7 @@ export interface ICell {
     rspan: number; // default 1
     style: {[key:string]:any};
     children?: Array<any>;
+    type?: string;
 }
 
 export interface ITableColumn {
@@ -29,7 +30,7 @@ export interface ISpanType extends ICellType {
 	type: SpanType;
 	value:number;
 }
-export type StyleType = 'textAlign' | 'textContent' | 'visibility'| 'width'| 'height'; 
+export type StyleType = 'textAlign' | 'textContent' | 'visibility' | 'width' | 'height' | 'multiLine'; 
 export interface IStyleType extends ICellType {
     type: StyleType;
     value:string;
@@ -117,6 +118,8 @@ export function updateTableCell(table:Array<ISingleRow>, target: IStyleType) {
     const tmp = table[row].cells[col];
     if (type === 'textContent') {
         tmp.label = value;
+    } else if (type === 'multiLine') {
+        tmp.type = value === 'true' ? 'textarea' : '';
     } else {
         if (tmp.style === undefined) tmp.style = {};
         tmp.style[type] = value;
