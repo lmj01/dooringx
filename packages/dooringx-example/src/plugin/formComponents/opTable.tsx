@@ -178,7 +178,6 @@ const MBorder = (props: MBorderProps) => {
 	// 数据
 	const [multiLine, setMultiLine] = useState<boolean>(false); // 修改值
 	useEffect(() => {
-		console.log('-23-', refMultiLine.current, multiLine)
 		if (validRowCol()) {
 			updateTableData((e:Array<ISingleRow>) => {
 				updateTableCell(e, { row: rowNo as number, col: colNo as number, type: 'multiLine', value: multiLine.toString() });
@@ -296,7 +295,7 @@ const MBorder = (props: MBorderProps) => {
 					}))}></Select>
 				</Col>
 				<Col span={8} className={'mj-line-height'}>
-					<Switch checkedChildren={'单行'} unCheckedChildren={'多行'} checked={refMultiLine.current} onChange={e=>{refMultiLine.current=e; setMultiLine(e);}} />
+					<Switch checkedChildren={'多行'} unCheckedChildren={'单行'} checked={refMultiLine.current} onChange={e=>{refMultiLine.current=e; setMultiLine(e);}} />
 				</Col>
 			</Row>
 			<Row>

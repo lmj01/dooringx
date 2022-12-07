@@ -119,7 +119,7 @@ export function updateTableCell(table:Array<ISingleRow>, target: IStyleType) {
     if (type === 'textContent') {
         tmp.label = value;
     } else if (type === 'multiLine') {
-        tmp.type = value === 'true' ? 'textarea' : '';
+        tmp.type = value === 'true' ? 'textarea' : undefined;
     } else {
         if (tmp.style === undefined) tmp.style = {};
         tmp.style[type] = value;
@@ -136,13 +136,14 @@ export function syncTableData(source:Array<ISingleRow>, target:Array<ISingleRow>
     for (let i = 0; i < source.length; i++) {
         let rowCells = source[i].cells;
         for (let j = 0; j < rowCells.length; j++) {
-            const { label, rspan, cspan, style, children } = rowCells[j] as ICell;
+            const { label, rspan, cspan, style, children, type } = rowCells[j] as ICell;
             if (i < target.length && j < target[i].cells.length) {
                 target[i].cells[j].label = label;
                 target[i].cells[j].rspan = rspan;
                 target[i].cells[j].cspan = cspan;
                 target[i].cells[j].style = style;
                 if (children) target[i].cells[j].children = children;
+                if (type) target[i].cells[j].type = type;
             }
         }
     }
