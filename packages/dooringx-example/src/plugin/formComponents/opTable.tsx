@@ -8,7 +8,7 @@ import { CreateOptionsRes } from 'dooringx-lib/dist/core/components/formTypes';
 import { IBlockType } from 'dooringx-lib/dist/core/store/storetype';
 import { updateFormBlockData } from '../helper/update';
 import { forkCountArray } from '../helper/utils';
-import { createTableByRowAndCol, ICell, ISingleRow, syncTableData, ISpanType, updateTableAfterModify, updateTableCell } from '../helper/table';
+import { createTableByRowAndCol, ICell, ISingleRow, syncTableData, ISpanType, updateTableAfterModify, updateTableCell, IStyleType, StyleType } from '../helper/table';
 import { getTemplateTableColumnData } from '@/pages/data/template';
 
 interface MBorderProps {
@@ -74,7 +74,7 @@ const MBorder = (props: MBorderProps) => {
 	// 再次选中时重构表格
 	function recreateTableData(c:number, r:number, table:Array<ISingleRow>) {
 		let newTable = createTableByRowAndCol(c, r, curBlock.props[(option as any).field[6]]);		
-		syncTableData(table, newTable);
+		syncTableData(table, newTable, c, r);
 		updateFormBlockData(store, props, (v) => v.props[(option as any).field[5]] = newTable);
 		setRows(newTable);
 	}
@@ -85,7 +85,6 @@ const MBorder = (props: MBorderProps) => {
 	// 变数据
 	const refSpanRow = useRef<number|undefined>();
 	const refSpanCol = useRef<number|undefined>();
-	const refMultiLine = useRef<boolean>(false);
 	// 选中的行和列编号
 	const [rowNo, setRowNo] = useState<number|undefined>();
 	const [colNo, setColNo] = useState<number|undefined>();
@@ -103,11 +102,14 @@ const MBorder = (props: MBorderProps) => {
 			if (t3) {
 				refSpanCol.current = t3.cspan;
 				refSpanRow.current = t3.rspan;
-				refMultiLine.current = t3.type === 'textarea';
+				if (!t3.type) t3.type = '';
+				setTypeContent(t3.type as StyleType);
 				setTextContent(t3.label);
 				if (t3.style) {
 					if (t3.style['textAlign']) setTextAlign(t3.style['textAlign']);					
 					if (t3.style['visibility']) setTextVisibility(t3.style['visibility']);
+					if (t3.style['width']) setCellWidth(parseInt(t3.style['width']));
+					if (t3.style['height']) setCellHeight(parseInt(t3.style['height']));
 				}
 			}
 		}
@@ -176,23 +178,20 @@ const MBorder = (props: MBorderProps) => {
 	}
 
 	// 数据
-	const [multiLine, setMultiLine] = useState<boolean>(false); // 修改值
-	useEffect(() => {
-		if (validRowCol()) {
-			updateTableData((e:Array<ISingleRow>) => {
-				updateTableCell(e, { row: rowNo as number, col: colNo as number, type: 'multiLine', value: multiLine.toString() });
-			});
-		}
-	}, [multiLine]);
-
+	const CellValueOption = [
+		{ value:'', label:'单行'},
+		{ value:'textarea', label:'多行'},
+		{ value:'checkbox', label:'可选类型'},
+	]
+	const [typeContent, setTypeContent] = useState<StyleType>(''); // 修改值
 	const [textContent, setTextContent] = useState<string>(''); // 修改值
 	useEffect(() => {
 		if (textContent.length > 0 && validRowCol()) {
 			updateTableData((e:Array<ISingleRow>) => {
-				updateTableCell(e, { row: rowNo as number, col: colNo as number, type: 'textContent', value: textContent });
+				updateTableCell(e, { row: rowNo as number, col: colNo as number, type: typeContent, value: textContent });
 			});
 		}
-	}, [textContent]);
+	}, [textContent, typeContent]);
 	
 	const TextAlignOption = [
 		{ value:'left', label:'左对齐'},
@@ -294,8 +293,9 @@ const MBorder = (props: MBorderProps) => {
 						label: i+1,
 					}))}></Select>
 				</Col>
-				<Col span={8} className={'mj-line-height'}>
-					<Switch checkedChildren={'多行'} unCheckedChildren={'单行'} checked={refMultiLine.current} onChange={e=>{refMultiLine.current=e; setMultiLine(e);}} />
+				<Col span={2}>{'类型'}</Col>
+				<Col span={6} className={'mj-line-height'}>
+					<Select value={typeContent} onSelect={(v) => setTypeContent(v)} options={CellValueOption}></Select>
 				</Col>
 			</Row>
 			<Row>

@@ -32,6 +32,20 @@ function TableCell({cell}:{cell:ICell}) {
 	if (cell.type === 'textarea') {
 		return <td colSpan={cell.cspan} rowSpan={cell.rspan} style={cell.style}><div className={'mj-cell'}><textarea value={cell.label}></textarea></div></td>	
 	}
+	else if (cell.type === 'checkbox') {
+		const data = (cell.label + '\n').split('\n');
+		return (
+			<td colSpan={cell.cspan} rowSpan={cell.rspan} style={cell.style}>
+				<div className={'mj-cell mj-checkbox-list'}>
+				{
+					data.map((e,index)=>{
+						return <div key={index}><input type="checkbox" /><label className={index+1==data.length?'last':''}>{e}</label></div>
+					})
+				}
+				</div>
+			</td>
+		)	
+	}
 	return <td colSpan={cell.cspan} rowSpan={cell.rspan} style={cell.style}><div className={'mj-cell'}>{cell.label}</div></td>
 }
 function TableSingleRow({cells}:ISingleRow) {

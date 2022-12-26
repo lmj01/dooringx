@@ -5,8 +5,7 @@ export interface ICell {
     cspan: number; // default 1
     rspan: number; // default 1
     style: {[key:string]:any};
-    children?: Array<any>;
-    type?: string;
+    type?: string; // 目前三种类型，默认为空, 多行文本textarea, 可选类型checkbox
 }
 
 export interface ITableColumn {
@@ -30,7 +29,7 @@ export interface ISpanType extends ICellType {
 	type: SpanType;
 	value:number;
 }
-export type StyleType = 'textAlign' | 'textContent' | 'visibility' | 'width' | 'height' | 'multiLine'; 
+export type StyleType = 'textAlign' | 'textContent' | 'visibility' | 'width' | 'height' | 'textarea' | 'checkbox' | ''; 
 export interface IStyleType extends ICellType {
     type: StyleType;
     value:string;
@@ -47,15 +46,15 @@ export function createTableByRowAndCol(col:number, row:number, spanInfo:Array<IS
     for (let i = 0; i < row; i++) {
         let tmpRow:Array<ICell> = [];
         for (let j = 0; j < col; j++) {
-            let rspan = 1;
-            let cspan = 1;
             tmpRow.push({
                 row: i, 
                 col: j, 
                 label:`${i}-${j}`, 
-                rspan: rspan, 
-                cspan: cspan,
-                style: {},
+                rspan: 1, 
+                cspan: 1,
+                style: {
+                    visibility: 'hidden',
+                },
             });
         }
         tmp.push({cells:tmpRow});
@@ -117,14 +116,20 @@ export function updateTableAfterModify(table:Array<ISingleRow>, target:ISpanType
 export function updateTableCell(table:Array<ISingleRow>, target: IStyleType) {
     const {col, row, type, value} = target;
     if (row === undefined || col === undefined || value.length < 1) return;
-    const tmp = table[row].cells[col];
-    if (type === 'textContent') {
-        tmp.label = value;
-    } else if (type === 'multiLine') {
-        tmp.type = value === 'true' ? 'textarea' : undefined;
-    } else {
-        if (tmp.style === undefined) tmp.style = {};
-        tmp.style[type] = value;
+    const rowData = table[row];
+    if (rowData) {
+        const tmp = rowData.cells.filter(e=>e.row==row&&e.col==col)[0];
+        if (tmp) {
+            if (['', 'textarea', 'checkbox'].includes(type)) {
+                tmp.type = type;
+                tmp.label = value;
+            } else {
+                if (tmp.style === undefined) tmp.style = {};
+                tmp.style[type] = value;
+            }
+        } else { 
+            console.warn(`更新单位的位置${col},${row},${type},${value}`)
+        }
     }
 }
 
@@ -133,20 +138,31 @@ export function updateTableCell(table:Array<ISingleRow>, target: IStyleType) {
  * @param soruce 
  * @param target 
  */
-export function syncTableData(source:Array<ISingleRow>, target:Array<ISingleRow>) {
-
-    for (let i = 0; i < source.length; i++) {
-        let rowCells = source[i].cells;
-        for (let j = 0; j < rowCells.length; j++) {
-            const { label, rspan, cspan, style, children, type } = rowCells[j] as ICell;
-            if (i < target.length && j < target[i].cells.length) {
-                target[i].cells[j].label = label;
-                target[i].cells[j].rspan = rspan;
-                target[i].cells[j].cspan = cspan;
-                target[i].cells[j].style = style;
-                if (children) target[i].cells[j].children = children;
-                if (type) target[i].cells[j].type = type;
-            }
+export function syncTableData(source:Array<ISingleRow>, target:Array<ISingleRow>, col:number, row:number) {
+    // row和col是不一致的，因为进行了合并操作，中间部分缺失了
+    for (let rSrc = 0; rSrc < row; rSrc++) {
+        let srcRow = source[rSrc];
+        if (srcRow) {
+            source[rSrc].cells.forEach((sCell,index)=>{
+                const { label, rspan, cspan, style, type } = sCell;
+                let dstRow = target[rSrc];
+                if (dstRow) {
+                    let find = false;
+                    target[rSrc].cells.forEach(cell=>{
+                        if (cell.row == sCell.row && cell.col == sCell.col) {
+                            find = true;
+                            cell.label = label;
+                            cell.rspan = rspan;
+                            cell.cspan = cspan;
+                            cell.style = style;
+                            if (type) cell.type = type;        
+                        }
+                    });
+                    if (find) console.warn(`no row=${sCell.row}, col=${sCell.col}, exist !!!`);    
+                } else {
+                    console.warn(`no row=${rSrc} exist !!!`);    
+                }
+            })
         }
     }
 }

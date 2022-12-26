@@ -34,6 +34,29 @@ table.mj-table {
 						border: unset;
 						resize: none;
 					}
+					&.mj-checkbox-list {
+						position: relative;
+						display: flex;
+						flex-direction: column;
+						width: 100%;
+						div {
+							position: relative;
+							width: 100%;
+							display: flex;
+							flex-wrap: wrap;
+							align-content: flex-start;
+							input {
+								margin-right: 6px;
+							}
+							label {
+								text-align: left;
+								&.last {
+									min-width: 90%;
+									border-bottom: 1px solid;
+								}
+							}
+						}
+					}
                 }
 			}
 		}
