@@ -305,13 +305,13 @@ const MBorder = (props: MBorderProps) => {
 				</Col>
 			</Row>
 			<Row>
-				<Col span={4}>{'合并列'}</Col>
+				<Col span={4}>{'合并列(下)'}</Col>
 				<Col span={8}>
-					<InputNumber min={1} max={colCount} value={refSpanCol.current} onChange={(e) => setSpanCol(e)}/>
+					<InputNumber min={1} max={rowCount} value={refSpanCol.current} onChange={(e) => setSpanCol(e)}/>
 				</Col>
-				<Col span={4}>{'合并行'}</Col>
+				<Col span={4}>{'合并行(右)'}</Col>
 				<Col span={8}>
-					<InputNumber min={1} max={rowCount} value={refSpanRow.current} onChange={(e) => setSpanRow(e)}/>
+					<InputNumber min={1} max={colCount} value={refSpanRow.current} onChange={(e) => setSpanRow(e)}/>
 				</Col>
 			</Row>
 			<Row>

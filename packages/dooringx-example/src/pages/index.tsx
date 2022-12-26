@@ -24,7 +24,7 @@ import { Button, Input, message, Modal, Statistic, Upload } from 'antd';
 import { localeKey } from '../../../dooringx-lib/dist/locale';
 import { LeftRegistComponentMapItem } from 'dooringx-lib/dist/core/crossDrag';
 import { toPng } from '../dom2image';
-import { getTemplateForm1, getTemplateEmpty, getTemplateForm2 } from './data/template';
+import { getTemplateForm1, getTemplateEmpty, getTemplateForm2, getTemplateForm3 } from './data/template';
 
 export const HeaderHeight = '40px';
 const footerConfig = function () {
@@ -107,6 +107,11 @@ export default function IndexPage() {
 			})
 		} else if (type === 'template-form2') {
 			getTemplateForm2().then((res) => {
+				config.getStore().resetToInitData([res]);
+				setOpen(false);	
+			})
+		} else if (type === 'template-form3') {
+			getTemplateForm3().then((res) => {
 				config.getStore().resetToInitData([res]);
 				setOpen(false);	
 			})
@@ -207,6 +212,7 @@ export default function IndexPage() {
 				</Upload>
 				<Button onClick={()=>handleBtnClick('template-form1')}>{'模板-定制式无托槽矫治器成品检验报告'}</Button>
 				<Button onClick={()=>handleBtnClick('template-form2')}>{'模板-批生产指令'}</Button>
+				<Button onClick={()=>handleBtnClick('template-form3')}>{'模板-定制式无托槽矫治器成品检验原始记录'}</Button>
 			</Modal>
 			<Modal visible={open1} onOk={()=>setOpen1(false)} onCancel={()=>setOpen1(false)} title={'preview'} width={600}>
 				<iframe src="/iframe" style={{
