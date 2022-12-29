@@ -17,6 +17,7 @@ export interface GlobalState {
 	script: string[];
 	lineHeight: number;
 	fontSize: number;
+	sizeSpecification: string;
 }
 
 export interface IStoreData {

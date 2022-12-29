@@ -159,10 +159,9 @@ export interface InitConfig {
 }
 
 export const defaultStore: IMainStoreData = {
-	// https://www.hangge.com/blog/cache/detail_1125.html
-	container: { // A4在分辨率为72得情况下为 595宽高842
-		width: 595,
-		height: 842,
+	container: { // define a4 96dpi
+		width: 793,
+		height: 1122,
 	},
 	block: [],
 	modalMap: {},
@@ -177,6 +176,7 @@ export const defaultStore: IMainStoreData = {
 		customAnimate: [],
 		lineHeight: 1.575,
 		fontSize: 14,
+		sizeSpecification: 'a4',
 	},
 	modalConfig: {},
 	modalEditName: '',

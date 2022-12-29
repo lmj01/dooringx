@@ -9,7 +9,7 @@ import { CreateOptionsRes } from '../core/components/formTypes';
 import { IBlockType, IStoreData } from '../core/store/storetype';
 import { CSSProperties, PropsWithChildren, ReactNode, useEffect, useMemo, useState } from 'react';
 import React from 'react';
-import { Tabs, Input, Row, Col, Checkbox, InputNumber } from 'antd';
+import { Tabs, Input, Row, Col, Checkbox, InputNumber, Select } from 'antd';
 import UserConfig from '../config';
 import { rgba2Obj } from '../core/utils';
 import deepcopy from 'deepcopy';
@@ -117,6 +117,41 @@ function RightConfig(props: PropsWithChildren<RightConfigProps>) {
 	const isEdit = props.config.getStore().isEdit();
 	const data = props.config.getStore().getData();
 	const modalName = data.modalEditName;
+
+	function updateContainerSize(width:number, height:number, sizeSpecification:string) {
+		const originData = deepcopy(props.config.getStore().getData());
+		originData.container.width = width;
+		originData.container.height = height;
+		originData.globalState.sizeSpecification = sizeSpecification;
+		props.config.getStore().setData(originData);
+	}
+	// 纸张规格
+	const SizeSpecificationOption = [
+		{ value:'a4', label:'A4纸张'},
+		{ value:'100x50mm', label:'100x50mm'},
+		{ value:'60x40mm', label:'60x40mm'},
+	]
+	const initSizeSpecification = useMemo(() => {
+		return props.config.getStore().getData().globalState.sizeSpecification;
+	}, [props.config]);
+	const [sizeSpecification, setSizeSpecification] = useState<string>(initSizeSpecification || 'a4');
+	useEffect(() => {
+		switch(sizeSpecification) {
+			case SizeSpecificationOption[0].value: {
+				updateContainerSize(793,1122, sizeSpecification);
+				break;
+			}
+			case SizeSpecificationOption[1].value: {
+				updateContainerSize(377,188, sizeSpecification);
+				break;
+			}
+			case SizeSpecificationOption[2].value: {
+				updateContainerSize(226,151, sizeSpecification);
+				break;
+			}
+		}
+	}, [sizeSpecification])
+
 	return (
 		<div
 			className="ant-menu right-pannel-wrap"
@@ -179,6 +214,12 @@ function RightConfig(props: PropsWithChildren<RightConfigProps>) {
 						</Col>
 					</Row>
 					<Row style={{ padding: '10px 0' }}>
+						<Col span={6} style={{ ...titletStyle }}>{replaceLocale('right.specification', '规格', props.config)}</Col>
+						<Col span={18} style={colStyle}>
+							<Select value={sizeSpecification} onChange={setSizeSpecification} options={SizeSpecificationOption} />
+						</Col>
+					</Row>
+					{/* <Row style={{ padding: '10px 0' }}>
 						<Col span={6} style={{ ...titletStyle }}>
 							{replaceLocale('right.containerheight', '容器高度', props.config)}
 						</Col>
@@ -211,7 +252,7 @@ function RightConfig(props: PropsWithChildren<RightConfigProps>) {
 								}}
 							/>
 						</Col>
-					</Row>
+					</Row> */}
 					<Row style={{ padding: '10px 0' }}>
 						<Col span={6} style={{ ...titletStyle }}>
 							{replaceLocale('right.containerColor', '容器底色', props.config)}
